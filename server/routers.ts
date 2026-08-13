@@ -1,6 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { categories, orders, productImages, products } from "../drizzle/schema";
+import { categories, orderItems, orders, productImages, products, users } from "../drizzle/schema";
 import { createPendingOrder, getCatalogProductBySlug, listActiveCategories, listCatalogProducts } from "./catalog";
 import { getDb } from "./db";
 import { storagePut } from "./storage";
@@ -59,6 +59,24 @@ export const appRouter = router({
         paidRevenueInCents: orderRows.filter(order => order.status === "paid" || order.status === "fulfilled").reduce((sum, order) => sum + order.totalInCents, 0), latestOrders,
       };
     }),
+    users: router({
+      list: adminProcedure.query(async () => {
+        const db = await requireDb();
+        return db.select({ id: users.id, openId: users.openId, name: users.name, email: users.email, role: users.role, createdAt: users.createdAt, lastSignedIn: users.lastSignedIn }).from(users).orderBy(desc(users.lastSignedIn));
+      }),
+      setRole: adminProcedure.input(z.object({ id: z.number().int().positive(), role: z.enum(["user", "admin"]) })).mutation(async ({ ctx, input }) => {
+        if (input.id === ctx.user.id && input.role !== "admin") throw new Error("No puedes retirarte el acceso de administrador desde tu propia sesión.");
+        const db = await requireDb();
+        await db.update(users).set({ role: input.role }).where(eq(users.id, input.id));
+        return { success: true };
+      }),
+      remove: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+        if (input.id === ctx.user.id) throw new Error("No puedes eliminar tu propia cuenta desde esta sesión.");
+        const db = await requireDb();
+        await db.delete(users).where(eq(users.id, input.id));
+        return { success: true };
+      }),
+    }),
     categories: router({
       list: adminProcedure.query(async () => { const db = await requireDb(); return db.select().from(categories).orderBy(desc(categories.createdAt)); }),
       save: adminProcedure.input(categoryInput).mutation(async ({ input }) => {
@@ -111,7 +129,11 @@ export const appRouter = router({
       }),
     }),
     orders: router({
-      list: adminProcedure.query(async () => { const db = await requireDb(); return db.select().from(orders).orderBy(desc(orders.createdAt)); }),
+      list: adminProcedure.query(async () => {
+        const db = await requireDb();
+        const [orderRows, itemRows] = await Promise.all([db.select().from(orders).orderBy(desc(orders.createdAt)), db.select().from(orderItems)]);
+        return orderRows.map(order => ({ ...order, items: itemRows.filter(item => item.orderId === order.id) }));
+      }),
       updateStatus: adminProcedure.input(z.object({ id: z.number().int().positive(), status: z.enum(["pending", "awaiting_payment", "paid", "cancelled", "fulfilled"]) })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(orders).set({ status: input.status }).where(eq(orders.id, input.id)); return { success: true }; }),
     }),
   }),

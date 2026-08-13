@@ -25,4 +25,14 @@ describe("administración protegida", () => {
     const caller = appRouter.createCaller(contextFor("user"));
     await expect(caller.admin.images.list({ productId: 1 })).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
+
+  it("impide que un administrador se quite su propio acceso", async () => {
+    const caller = appRouter.createCaller(contextFor("admin"));
+    await expect(caller.admin.users.setRole({ id: 1, role: "user" })).rejects.toThrow("No puedes retirarte el acceso");
+  });
+
+  it("impide que un administrador elimine su propia cuenta", async () => {
+    const caller = appRouter.createCaller(contextFor("admin"));
+    await expect(caller.admin.users.remove({ id: 1 })).rejects.toThrow("No puedes eliminar tu propia cuenta");
+  });
 });

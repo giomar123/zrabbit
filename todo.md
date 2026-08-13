@@ -43,3 +43,9 @@
 - [x] Verificar la identidad zRabbit en escritorio y móvil y sincronizarla en GitHub.
 - [x] Crear una versión favicon del logo zRabbit y alojarla en la configuración pública.
 - [x] Configurar y verificar el favicon de zRabbit en la pestaña del navegador y sincronizarlo en GitHub.
+- [x] Rediseñar la navegación del panel con pestañas de Productos, Usuarios, Pedidos y Mi cuenta.
+- [x] Implementar una vista de productos para crear, editar, retirar y controlar stock.
+- [x] Implementar una vista de pedidos que use únicamente pedidos reales registrados en la tienda.
+- [x] Implementar una vista segura de usuarios y perfil, sin exponer datos de clientes no autorizados.
+- [ ] Verificar permisos, la adaptación móvil y la sincronización del nuevo panel en GitHub.
+- [x] Añadir pruebas de seguridad para los cambios de rol y retiro de usuarios del panel.
