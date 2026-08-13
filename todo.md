@@ -42,4 +42,4 @@
 - [x] Reemplazar la marca Figura Fiebre por zRabbit en cabecera, pie de página y metadatos.
 - [x] Verificar la identidad zRabbit en escritorio y móvil y sincronizarla en GitHub.
 - [x] Crear una versión favicon del logo zRabbit y alojarla en la configuración pública.
-- [ ] Configurar y verificar el favicon de zRabbit en la pestaña del navegador y sincronizarlo en GitHub.
+- [x] Configurar y verificar el favicon de zRabbit en la pestaña del navegador y sincronizarlo en GitHub.
