@@ -92,6 +92,8 @@
 - [x] Permitir asignar Administrador o Editor de productos al autorizar un Gmail.
 - [x] Proteger usuarios, Gmail autorizados, pedidos y cuenta para que solo Administradores los gestionen.
 - [ ] Aplicar en Railway la migración de Gmail autorizados que falta y validar la adición de un correo.
+- [ ] Inspeccionar en Railway la tabla __drizzle_migrations y confirmar si existen authorizedGoogleEmails y su columna role.
+- [x] Separar la migración de roles MySQL para evitar dos ALTER TABLE en la misma consulta de Railway.
 - [x] Añadir y ejecutar pruebas de permisos del perfil Editor de productos.
 - [x] Ocultar al Editor cualquier control fuera de productos, precios, stock e imágenes, incluida la gestión de categorías.
 - [x] Ampliar las pruebas del Editor para cubrir operaciones positivas de productos, precios, stock e imágenes.
