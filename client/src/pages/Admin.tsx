@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Archive, ArrowLeft, Boxes, ClipboardList, ImagePlus, Loader2, LogOut, Pencil, Plus, Save, ShieldAlert, Trash2, UserCog, Users } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { toast } from "sonner";
-import { Link } from "wouter";
+import { Link, useSearch } from "wouter";
 
 type Tab = "products" | "users" | "orders" | "account";
 type CategoryForm = { id?: number; name: string; slug: string; description: string; accentColor: string; isActive: boolean };
@@ -19,8 +19,8 @@ function TabButton({ active, label, icon: Icon, onClick }: { active: boolean; la
 function Status({ value }: { value: string }) { const labels: Record<string, string> = { pending: "Pendiente", awaiting_payment: "Esperando pago", paid: "Pagado", fulfilled: "Entregado", cancelled: "Cancelado", active: "Publicado", draft: "Borrador", archived: "Archivado" }; const colors: Record<string, string> = { paid: "bg-emerald-50 text-emerald-800", fulfilled: "bg-emerald-50 text-emerald-800", cancelled: "bg-red-50 text-red-700", active: "bg-blue-50 text-blue-800", pending: "bg-amber-50 text-amber-800", awaiting_payment: "bg-amber-50 text-amber-800" }; return <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${colors[value] ?? "bg-slate-100 text-slate-700"}`}>{labels[value] ?? value}</span>; }
 
 export default function Admin() {
-  const { user, loading, logout } = useAuth(); const isAdmin = user?.role === "admin"; const utils = trpc.useUtils();
-  const [tab, setTab] = useState<Tab>("products"); const [categoryForm, setCategoryForm] = useState<CategoryForm>(initialCategory); const [productForm, setProductForm] = useState<ProductForm>(initialProduct); const [activeProductId, setActiveProductId] = useState<number | null>(null);
+  const { user, loading, logout } = useAuth(); const isAdmin = user?.role === "admin"; const utils = trpc.useUtils(); const search = useSearch(); const requestedTab = new URLSearchParams(search).get("tab");
+  const initialTab: Tab = requestedTab === "users" || requestedTab === "orders" || requestedTab === "account" ? requestedTab : "products"; const [tab, setTab] = useState<Tab>(initialTab); const [categoryForm, setCategoryForm] = useState<CategoryForm>(initialCategory); const [productForm, setProductForm] = useState<ProductForm>(initialProduct); const [activeProductId, setActiveProductId] = useState<number | null>(null);
   const dashboard = trpc.admin.dashboard.useQuery(undefined, { enabled: isAdmin }); const categoryQuery = trpc.admin.categories.list.useQuery(undefined, { enabled: isAdmin }); const productQuery = trpc.admin.products.list.useQuery(undefined, { enabled: isAdmin }); const orderQuery = trpc.admin.orders.list.useQuery(undefined, { enabled: isAdmin }); const userQuery = trpc.admin.users.list.useQuery(undefined, { enabled: isAdmin }); const imageQuery = trpc.admin.images.list.useQuery({ productId: activeProductId ?? 0 }, { enabled: isAdmin && activeProductId !== null });
   const refresh = async () => { await Promise.all([utils.admin.dashboard.invalidate(), utils.admin.products.list.invalidate(), utils.admin.orders.list.invalidate()]); };
   const saveCategory = trpc.admin.categories.save.useMutation({ onSuccess: () => { toast.success("Categoría guardada."); setCategoryForm(initialCategory); categoryQuery.refetch(); }, onError: error => toast.error(error.message) });

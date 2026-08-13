@@ -47,5 +47,7 @@
 - [x] Implementar una vista de productos para crear, editar, retirar y controlar stock.
 - [x] Implementar una vista de pedidos que use únicamente pedidos reales registrados en la tienda.
 - [x] Implementar una vista segura de usuarios y perfil, sin exponer datos de clientes no autorizados.
-- [ ] Verificar permisos, la adaptación móvil y la sincronización del nuevo panel en GitHub.
+- [x] Verificar permisos, la adaptación móvil y la sincronización del nuevo panel en GitHub.
+- [x] Verificar en sesión de administrador las pestañas Productos, Usuarios, Pedidos y Mi cuenta, incluida su adaptación móvil.
+- [x] Documentar por separado la evidencia de panel autenticado y de acceso restringido para visitantes.
 - [x] Añadir pruebas de seguridad para los cambios de rol y retiro de usuarios del panel.
