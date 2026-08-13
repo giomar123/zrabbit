@@ -123,7 +123,7 @@
 - [ ] Sustituir de forma segura en Railway la Public Key y el Access Token regenerados.
 - [x] Identificar por qué Railway no detecta el Access Token como credencial de prueba y aplicar el valor correcto.
 - [ ] Forzar un redeploy de Railway después de actualizar las credenciales de Mercado Pago.
-- [ ] Confirmar que VITE_MERCADOPAGO_PUBLIC_KEY y MERCADOPAGO_ACCESS_TOKEN provienen de la misma aplicación de prueba.
+- [x] Confirmar que VITE_MERCADOPAGO_PUBLIC_KEY y MERCADOPAGO_ACCESS_TOKEN provienen de la misma aplicación de prueba.
 - [x] Añadir diagnóstico seguro para distinguir errores de autorización, token de tarjeta y configuración de Mercado Pago.
 - [x] Inspeccionar en Railway el resultado de un intento 401 sin revelar tarjetas, claves ni datos personales.
 - [x] Obtener desde el navegador habitual del propietario la línea saneada de Railway con status, code y cause del intento 401.
@@ -132,12 +132,12 @@
 - [x] Verificar en Railway el alcance, origen y huella no reversible de MERCADOPAGO_ACCESS_TOKEN sin revelar su valor.
 - [ ] Comparar de forma no reversible la VITE_MERCADOPAGO_PUBLIC_KEY compilada en el frontend con la variable de Railway.
 - [x] Verificar visualmente que ambas credenciales proceden de la sección Pruebas de la misma aplicación de Mercado Pago.
-- [ ] Auditar de forma segura la clave pública efectiva y el token generado por el Payment Brick durante una prueba.
+- [x] Auditar de forma segura la clave pública efectiva y el token generado por el Payment Brick durante una prueba.
 - [x] Verificar que la aplicación de Mercado Pago esté habilitada para el producto Payment Brick o Checkout API usado por zRabbit.
-- [ ] Registrar sin datos sensibles la huella del token generado por el Payment Brick y de la Public Key usada en el intento de pago.
-- [ ] Desplegar el commit con trazabilidad segura en Railway y revisar el bloque `[Mercado Pago credential trace]` del siguiente intento de prueba.
-- [ ] Contrastar la traza coincidente de claves con el flujo oficial de cuentas de prueba de Mercado Pago para Payment Brick.
-- [ ] Preparar un caso de soporte de Mercado Pago con evidencia técnica saneada del 401 persistente.
+- [x] Registrar sin datos sensibles la huella del token generado por el Payment Brick y de la Public Key usada en el intento de pago.
+- [x] Desplegar el commit con trazabilidad segura en Railway y revisar el bloque `[Mercado Pago credential trace]` del siguiente intento de prueba.
+- [x] Contrastar la traza coincidente de claves con el flujo oficial de cuentas de prueba de Mercado Pago para Payment Brick.
+- [x] Preparar un caso de soporte de Mercado Pago con evidencia técnica saneada del 401 persistente.
 - [ ] Definir por separado una activación de producción con confirmación explícita antes de habilitar cobros reales.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.
 - [x] Mostrar en el panel administrativo el historial de notificaciones de pago por pedido.

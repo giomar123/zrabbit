@@ -36,6 +36,29 @@ error: unauthorized
 message: Unauthorized use of live credentials
 ```
 
+## Transcripción de evidencia saneada
+
+El propietario reportó desde Railway el siguiente bloque, sin valores secretos:
+
+```text
+[Mercado Pago credential trace] {
+  cardToken: { present: true, fingerprint: '49f4be72952c' },
+  clientPublicKey: { prefix: 'APP_USR-d6b8', fingerprint: '901b18d85e96' },
+  serverPublicKey: {
+    configured: true,
+    prefix: 'APP_USR-d6b8',
+    fingerprint: '901b18d85e96'
+  },
+  accessToken: {
+    configured: true,
+    prefix: 'APP_USR-6995',
+    fingerprint: 'b3f2efa54d4b'
+  }
+}
+```
+
+El propietario también confirmó que ambos prefijos proceden de **zRabbit → Pruebas → Credenciales de prueba** de la aplicación `5719254850259715`, y que posteriormente cambió el producto de esa aplicación a **Checkout Bricks**.
+
 ## Solicitud a soporte
 
 Por favor, confirmen si las credenciales de prueba de la aplicación `5719254850259715` están habilitadas para pagos con tarjeta mediante Payment Brick en Perú, y si existe alguna restricción, activación pendiente o conflicto de entorno asociado a este par de credenciales. También indiquen por qué una solicitud con las credenciales de prueba listadas para esa aplicación y una tarjeta oficial de prueba se clasifica como uso de credenciales live.
