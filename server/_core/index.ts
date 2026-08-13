@@ -36,6 +36,7 @@ function escapeHtml(value: string) {
 }
 
 async function registerProductSharingRoutes(app: express.Express) {
+  if (process.env.NODE_ENV === "development") return;
   app.get("/productos/:slug", async (req, res, next) => {
     try {
       const record = await getCatalogProductBySlug(req.params.slug);

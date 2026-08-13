@@ -26,3 +26,8 @@
 - [x] Añadir pruebas unitarias para catálogo público, validaciones de stock insuficiente y creación de pedidos.
 - [x] Añadir pruebas adicionales para la administración de imágenes.
 - [x] Documentar la revisión básica de accesibilidad y guardar el punto de restauración final.
+- [x] Reemplazar la estética Memphis por una experiencia editorial limpia centrada en la fotografía de producto.
+- [x] Reestructurar la portada, el catálogo, el carrito y la ficha para una jerarquía visual de comercio más clara.
+- [x] Validar el carrito editorial con la ficha y la portada en el navegador.
+- [x] Cargar las tres fotografías persistentes y publicar el producto de prueba Pikachu Select a S/ 95.
+- [x] Verificar en escritorio y móvil el rediseño inspirado en la referencia proporcionada.
