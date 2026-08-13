@@ -88,3 +88,17 @@
 - [x] Añadir al panel la creación y retiro seguro de Gmail autorizados.
 - [x] Validar que una cuenta Google no autorizada reciba rechazo aunque tenga el enlace de acceso.
 - [x] Añadir y ejecutar pruebas de la lista permitida de Gmail y del rechazo por rol insuficiente.
+- [x] Añadir el rol Editor de productos con acceso exclusivo a catálogo, precios, stock e imágenes.
+- [x] Permitir asignar Administrador o Editor de productos al autorizar un Gmail.
+- [x] Proteger usuarios, Gmail autorizados, pedidos y cuenta para que solo Administradores los gestionen.
+- [ ] Aplicar en Railway la migración de Gmail autorizados que falta y validar la adición de un correo.
+- [x] Añadir y ejecutar pruebas de permisos del perfil Editor de productos.
+- [x] Ocultar al Editor cualquier control fuera de productos, precios, stock e imágenes, incluida la gestión de categorías.
+- [x] Ampliar las pruebas del Editor para cubrir operaciones positivas de productos, precios, stock e imágenes.
+- [x] Reemplazar el ocultamiento estructural de categorías por renderizado condicional explícito según el rol Editor.
+- [x] Probar de forma significativa la creación y edición de producto con precio y la administración de imágenes para el Editor.
+- [x] Probar que el Editor puede crear y editar productos, incluido el cambio de precio.
+- [x] Probar las operaciones permitidas de imágenes del Editor con resultados verificables.
+- [x] Verificar en una sesión Editor que la pestaña Productos no muestra la gestión de categorías.
+- [x] Ejecutar una prueba reversible de carga y retiro de imagen con el perfil Editor.
+- [x] Confirmar explícitamente que la prueba temporal del Editor queda archivada como limpieza controlada.

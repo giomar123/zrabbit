@@ -21,10 +21,11 @@ describe("admin.googleAccess", () => {
   it("permite agregar y retirar un Gmail autorizado", async () => {
     const email = "access-test@example.com";
     const caller = appRouter.createCaller(contextFor("admin"));
-    await caller.admin.googleAccess.add({ email });
+    await caller.admin.googleAccess.add({ email, role: "editor" });
     const entries = await caller.admin.googleAccess.list();
     const entry = entries.find(item => item.email === email);
     expect(entry).toBeTruthy();
+    expect(entry?.role).toBe("editor");
     await caller.admin.googleAccess.remove({ id: entry!.id });
     const remaining = await caller.admin.googleAccess.list();
     expect(remaining.find(item => item.email === email)).toBeUndefined();

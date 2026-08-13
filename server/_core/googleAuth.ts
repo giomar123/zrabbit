@@ -3,7 +3,7 @@ import type { Express, Request, Response } from "express";
 import { parse as parseCookieHeader } from "cookie";
 import { createRemoteJWKSet, jwtVerify, SignJWT } from "jose";
 import type { User } from "../../drizzle/schema";
-import { getUserByOpenId, isGoogleEmailAuthorized, upsertUser } from "../db";
+import { getGoogleEmailAccess, getUserByOpenId, upsertUser } from "../db";
 import { getSessionCookieOptions } from "./cookies";
 
 const GOOGLE_STATE_COOKIE = "zrabbit_google_state";
@@ -23,10 +23,12 @@ function encodeState(value: StatePayload) { return Buffer.from(JSON.stringify(va
 
 export function isGoogleAuthConfigured() { const value = config(); return Boolean(value.clientId && value.clientSecret && value.adminEmail && value.redirectUri && value.jwtSecret); }
 
-async function issueSession(openId: string, email: string) {
+async function accessRoleFor(email: string): Promise<"admin" | "editor" | null> { const { adminEmail } = config(); return email === adminEmail ? "admin" : getGoogleEmailAccess(email); }
+
+async function issueSession(openId: string, email: string, role: "admin" | "editor") {
   const key = secret();
   if (!key) throw new Error("JWT_SECRET no está configurado.");
-  return new SignJWT({ kind: "google_admin", email }).setProtectedHeader({ alg: "HS256" }).setSubject(openId).setIssuedAt().setExpirationTime("12h").sign(key);
+  return new SignJWT({ kind: "google_admin", email, role }).setProtectedHeader({ alg: "HS256" }).setSubject(openId).setIssuedAt().setExpirationTime("12h").sign(key);
 }
 
 export async function authenticateGoogleAdmin(req: Request): Promise<User | null> {
@@ -35,9 +37,10 @@ export async function authenticateGoogleAdmin(req: Request): Promise<User | null
   try {
     const { payload } = await jwtVerify(token, key);
     const email = String(payload.email ?? "").toLowerCase(); const openId = String(payload.sub ?? "");
-    if (payload.kind !== "google_admin" || !openId || (email !== adminEmail && !(await isGoogleEmailAuthorized(email)))) return null;
+    const role = await accessRoleFor(email);
+    if (payload.kind !== "google_admin" || !openId || !role) return null;
     const user = await getUserByOpenId(openId);
-    return user?.role === "admin" ? user : null;
+    return user?.role === role ? user : null;
   } catch { return null; }
 }
 
@@ -67,10 +70,10 @@ export function registerGoogleAuthRoutes(app: Express) {
       if (!token.id_token) throw new Error("Google no entregó una identidad válida.");
       const { payload } = await jwtVerify(token.id_token, googleKeys, { audience: clientId, issuer: GOOGLE_ISSUERS });
       const email = String(payload.email ?? "").trim().toLowerCase(); const openId = `google:${String(payload.sub ?? "")}`;
-      const listed = await isGoogleEmailAuthorized(email);
-      if (!payload.sub || payload.nonce !== saved.nonce || payload.email_verified !== true || (email !== adminEmail && !listed)) return res.status(403).send("Esta cuenta Google no está autorizada para administrar zRabbit.");
-      await upsertUser({ openId, name: typeof payload.name === "string" ? payload.name : "Administrador zRabbit", email, loginMethod: "google", role: "admin", lastSignedIn: new Date() });
-      const session = await issueSession(openId, email);
+      const role = await accessRoleFor(email);
+      if (!payload.sub || payload.nonce !== saved.nonce || payload.email_verified !== true || !role) return res.status(403).send("Esta cuenta Google no está autorizada para administrar zRabbit.");
+      await upsertUser({ openId, name: typeof payload.name === "string" ? payload.name : "Usuario zRabbit", email, loginMethod: "google", role, lastSignedIn: new Date() });
+      const session = await issueSession(openId, email, role);
       res.cookie(GOOGLE_SESSION_COOKIE, session, { ...getSessionCookieOptions(req), maxAge: 12 * 60 * 60 * 1000 });
       res.redirect(302, "/admin");
     } catch (error) { console.error("[Google OAuth]", error); res.status(500).send("No se pudo completar el inicio de sesión con Google."); }

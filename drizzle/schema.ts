@@ -6,7 +6,7 @@ export const users = mysqlTable("users", {
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "editor", "admin"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -15,6 +15,7 @@ export const users = mysqlTable("users", {
 export const authorizedGoogleEmails = mysqlTable("authorizedGoogleEmails", {
   id: int("id").autoincrement().primaryKey(),
   email: varchar("email", { length: 320 }).notNull(),
+  role: mysqlEnum("role", ["editor", "admin"]).default("editor").notNull(),
   createdByUserId: int("createdByUserId"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, table => [uniqueIndex("authorized_google_emails_email_uq").on(table.email)]);

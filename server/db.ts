@@ -89,12 +89,18 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-export async function isGoogleEmailAuthorized(email: string) {
+export type GoogleAccessRole = "editor" | "admin";
+
+export async function getGoogleEmailAccess(email: string): Promise<GoogleAccessRole | null> {
   const db = await getDb();
-  if (!db) return false;
+  if (!db) return null;
   const normalized = email.trim().toLowerCase();
-  const result = await db.select({ id: authorizedGoogleEmails.id }).from(authorizedGoogleEmails).where(eq(authorizedGoogleEmails.email, normalized)).limit(1);
-  return result.length > 0;
+  const result = await db.select({ role: authorizedGoogleEmails.role }).from(authorizedGoogleEmails).where(eq(authorizedGoogleEmails.email, normalized)).limit(1);
+  return result[0]?.role ?? null;
+}
+
+export async function isGoogleEmailAuthorized(email: string) {
+  return (await getGoogleEmailAccess(email)) !== null;
 }
 
 // TODO: add feature queries here as your schema grows.

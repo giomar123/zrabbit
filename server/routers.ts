@@ -8,7 +8,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { isGoogleAuthConfigured, logoutGoogleAdmin } from "./_core/googleAuth";
 import { systemRouter } from "./_core/systemRouter";
-import { adminProcedure, publicProcedure, router } from "./_core/trpc";
+import { adminProcedure, catalogEditorProcedure, publicProcedure, router } from "./_core/trpc";
 
 const slugSchema = z.string().trim().min(2).max(200).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Usa minúsculas, números y guiones.");
 const categoryInput = z.object({ id: z.number().int().positive().optional(), name: z.string().trim().min(2).max(100), slug: slugSchema.max(120), description: z.string().trim().max(1000).optional(), accentColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/), isActive: z.boolean().default(true) });
@@ -82,11 +82,12 @@ export const appRouter = router({
     }),
     googleAccess: router({
       list: adminProcedure.query(async () => { const db = await requireDb(); return db.select().from(authorizedGoogleEmails).orderBy(desc(authorizedGoogleEmails.createdAt)); }),
-      add: adminProcedure.input(z.object({ email: z.string().trim().email().max(320) })).mutation(async ({ ctx, input }) => {
+      add: adminProcedure.input(z.object({ email: z.string().trim().email().max(320), role: z.enum(["editor", "admin"]).default("editor") })).mutation(async ({ ctx, input }) => {
         const db = await requireDb(); const email = input.email.toLowerCase();
-        await db.insert(authorizedGoogleEmails).values({ email, createdByUserId: ctx.user.id }).onDuplicateKeyUpdate({ set: { email } });
-        return { success: true, email };
+        await db.insert(authorizedGoogleEmails).values({ email, role: input.role, createdByUserId: ctx.user.id }).onDuplicateKeyUpdate({ set: { email, role: input.role } });
+        return { success: true, email, role: input.role };
       }),
+      setRole: adminProcedure.input(z.object({ id: z.number().int().positive(), role: z.enum(["editor", "admin"]) })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(authorizedGoogleEmails).set({ role: input.role }).where(eq(authorizedGoogleEmails.id, input.id)); return { success: true }; }),
       remove: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
         const db = await requireDb(); const row = await db.select().from(authorizedGoogleEmails).where(eq(authorizedGoogleEmails.id, input.id)).limit(1);
         if (!row[0]) return { success: true };
@@ -95,7 +96,7 @@ export const appRouter = router({
       }),
     }),
     categories: router({
-      list: adminProcedure.query(async () => { const db = await requireDb(); return db.select().from(categories).orderBy(desc(categories.createdAt)); }),
+      list: catalogEditorProcedure.query(async () => { const db = await requireDb(); return db.select().from(categories).orderBy(desc(categories.createdAt)); }),
       save: adminProcedure.input(categoryInput).mutation(async ({ input }) => {
         const db = await requireDb(); const values = { name: input.name, slug: input.slug, description: input.description ?? null, accentColor: input.accentColor, isActive: input.isActive };
         if (input.id) { await db.update(categories).set(values).where(eq(categories.id, input.id)); return { id: input.id }; }
@@ -103,18 +104,18 @@ export const appRouter = router({
       }),
     }),
     products: router({
-      list: adminProcedure.query(async () => { const db = await requireDb(); return db.select({ product: products, category: categories }).from(products).innerJoin(categories, eq(products.categoryId, categories.id)).orderBy(desc(products.updatedAt)); }),
-      save: adminProcedure.input(productInput).mutation(async ({ input }) => {
+      list: catalogEditorProcedure.query(async () => { const db = await requireDb(); return db.select({ product: products, category: categories }).from(products).innerJoin(categories, eq(products.categoryId, categories.id)).orderBy(desc(products.updatedAt)); }),
+      save: catalogEditorProcedure.input(productInput).mutation(async ({ input }) => {
         const db = await requireDb(); const values = { categoryId: input.categoryId, name: input.name, slug: input.slug, sku: input.sku || null, shortDescription: input.shortDescription, description: input.description ?? null, priceInCents: input.priceInCents, compareAtPriceInCents: input.compareAtPriceInCents ?? null, stock: input.stock, status: input.status, isFeatured: input.isFeatured, isOffer: input.isOffer, mainImageUrl: input.mainImageUrl ?? null, metaTitle: input.metaTitle || null, metaDescription: input.metaDescription || null };
         if (input.id) { await db.update(products).set(values).where(eq(products.id, input.id)); return { id: input.id }; }
         const result = await db.insert(products).values(values); return { id: Number(result[0].insertId) };
       }),
-      archive: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(products).set({ status: "archived" }).where(eq(products.id, input.id)); return { success: true }; }),
-      updateStock: adminProcedure.input(z.object({ id: z.number().int().positive(), stock: z.number().int().min(0) })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(products).set({ stock: input.stock }).where(eq(products.id, input.id)); return { success: true }; }),
+      archive: catalogEditorProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(products).set({ status: "archived" }).where(eq(products.id, input.id)); return { success: true }; }),
+      updateStock: catalogEditorProcedure.input(z.object({ id: z.number().int().positive(), stock: z.number().int().min(0) })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(products).set({ stock: input.stock }).where(eq(products.id, input.id)); return { success: true }; }),
     }),
     images: router({
-      list: adminProcedure.input(z.object({ productId: z.number().int().positive() })).query(async ({ input }) => { const db = await requireDb(); return db.select().from(productImages).where(eq(productImages.productId, input.productId)).orderBy(productImages.sortOrder); }),
-      upload: adminProcedure.input(z.object({ productId: z.number().int().positive(), filename: z.string().min(1).max(180), contentType: z.enum(["image/jpeg", "image/png", "image/webp"]), dataUrl: z.string().min(100).max(7_000_000), altText: z.string().trim().min(3).max(220) })).mutation(async ({ input }) => {
+      list: catalogEditorProcedure.input(z.object({ productId: z.number().int().positive() })).query(async ({ input }) => { const db = await requireDb(); return db.select().from(productImages).where(eq(productImages.productId, input.productId)).orderBy(productImages.sortOrder); }),
+      upload: catalogEditorProcedure.input(z.object({ productId: z.number().int().positive(), filename: z.string().min(1).max(180), contentType: z.enum(["image/jpeg", "image/png", "image/webp"]), dataUrl: z.string().min(100).max(7_000_000), altText: z.string().trim().min(3).max(220) })).mutation(async ({ input }) => {
         const db = await requireDb();
         const product = await db.select({ id: products.id }).from(products).where(eq(products.id, input.productId)).limit(1);
         if (!product[0]) throw new Error("El producto no existe.");
@@ -128,8 +129,8 @@ export const appRouter = router({
         if (isPrimary) await db.update(products).set({ mainImageUrl: url }).where(eq(products.id, input.productId));
         return { id: Number(result[0].insertId), key, url, isPrimary };
       }),
-      update: adminProcedure.input(z.object({ id: z.number().int().positive(), altText: z.string().trim().min(3).max(220), sortOrder: z.number().int().min(0) })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(productImages).set({ altText: input.altText, sortOrder: input.sortOrder }).where(eq(productImages.id, input.id)); return { success: true }; }),
-      makePrimary: adminProcedure.input(z.object({ id: z.number().int().positive(), productId: z.number().int().positive() })).mutation(async ({ input }) => {
+      update: catalogEditorProcedure.input(z.object({ id: z.number().int().positive(), altText: z.string().trim().min(3).max(220), sortOrder: z.number().int().min(0) })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(productImages).set({ altText: input.altText, sortOrder: input.sortOrder }).where(eq(productImages.id, input.id)); return { success: true }; }),
+      makePrimary: catalogEditorProcedure.input(z.object({ id: z.number().int().positive(), productId: z.number().int().positive() })).mutation(async ({ input }) => {
         const db = await requireDb(); const image = await db.select().from(productImages).where(and(eq(productImages.id, input.id), eq(productImages.productId, input.productId))).limit(1);
         if (!image[0]) throw new Error("La imagen no existe.");
         await db.update(productImages).set({ isPrimary: false }).where(eq(productImages.productId, input.productId));
@@ -137,7 +138,7 @@ export const appRouter = router({
         await db.update(products).set({ mainImageUrl: image[0].url }).where(eq(products.id, input.productId));
         return { success: true, url: image[0].url };
       }),
-      remove: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
+      remove: catalogEditorProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
         const db = await requireDb(); const image = await db.select().from(productImages).where(eq(productImages.id, input.id)).limit(1);
         if (!image[0]) return { success: true };
         await db.delete(productImages).where(eq(productImages.id, input.id));

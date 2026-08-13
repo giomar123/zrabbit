@@ -43,3 +43,12 @@ export const adminProcedure = t.procedure.use(
     });
   }),
 );
+
+export const catalogEditorProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
+    if (ctx.user.role !== "admin" && ctx.user.role !== "editor") throw new TRPCError({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
