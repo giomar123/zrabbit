@@ -18,6 +18,16 @@ Verificación comunicada por el propietario el 13 de agosto de 2026:
 
 No se registraron valores completos de credenciales, tokens de tarjeta ni firmas de webhook.
 
+## Flujo oficial de prueba de Checkout Bricks
+
+La documentación oficial indica que **Checkout Bricks no soporta cuentas de prueba** para sus pruebas de integración. Para pagos con tarjeta se deben usar las **credenciales de prueba de la cuenta real del vendedor**, un correo de pagador diferente al correo usado en Mercado Pago y una tarjeta de prueba local.
+
+Para simular un pago aprobado en Perú, la guía indica Mastercard `5031 7557 3453 0604`, código `123`, vencimiento `11/30` y titular `APRO`. El formulario de zRabbit emplea tipo de documento DNI; debe usarse un DNI ficticio de **8 dígitos**, conforme al formato peruano. Estos datos se aplican únicamente en el entorno de prueba.
+
+- https://www.mercadopago.com.ar/developers/es/docs/your-integrations/test/accounts
+- https://www.mercadopago.com.pe/developers/es/docs/checkout-bricks/integration-test/test-payment-flow
+- https://www.mercadopago.com.pe/developers/es/docs/checkout-bricks/integration-test/test-cards
+
 ## Fuentes
 
 - https://www.mercadopago.com.pe/developers/en/docs/checkout-bricks/overview

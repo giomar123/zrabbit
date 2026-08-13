@@ -135,6 +135,10 @@
 - [ ] Auditar de forma segura la clave pública efectiva y el token generado por el Payment Brick durante una prueba.
 - [x] Verificar que la aplicación de Mercado Pago esté habilitada para el producto Payment Brick o Checkout API usado por zRabbit.
 - [ ] Registrar sin datos sensibles la huella del token generado por el Payment Brick y de la Public Key usada en el intento de pago.
+- [ ] Desplegar el commit con trazabilidad segura en Railway y revisar el bloque `[Mercado Pago credential trace]` del siguiente intento de prueba.
+- [ ] Contrastar la traza coincidente de claves con el flujo oficial de cuentas de prueba de Mercado Pago para Payment Brick.
+- [ ] Preparar un caso de soporte de Mercado Pago con evidencia técnica saneada del 401 persistente.
+- [ ] Definir por separado una activación de producción con confirmación explícita antes de habilitar cobros reales.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.
 - [x] Mostrar en el panel administrativo el historial de notificaciones de pago por pedido.
 - [ ] Configurar en Mercado Pago y Railway la firma de webhooks para el entorno de prueba.
