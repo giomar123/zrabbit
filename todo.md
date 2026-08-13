@@ -152,6 +152,8 @@
 - [ ] Aplicar la migración 0006 de método Shalom y envío gratuito en Railway antes del siguiente despliegue.
 - [ ] Ejecutar la migración 0006 en Railway para restaurar la creación de pedidos publicados.
 - [ ] Separar las sentencias ALTER TABLE de la migración 0006 para compatibilidad con MySQL Railway.
+- [ ] Desplegar el commit de corrección y confirmar en Railway que la migración 0006 finaliza sin error de sentencias múltiples.
+- [ ] Hacer idempotente la migración 0006 para completar `isFreeShipping` aunque `shippingMethod` ya exista en Railway.
 - [ ] Crear un producto de prueba de Yape a S/ 10 con una excepción controlada al pedido mínimo.
 - [ ] Mantener el pedido mínimo de S/ 99 para cualquier carrito que contenga productos reales.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.
