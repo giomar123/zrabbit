@@ -19,10 +19,19 @@ function toStoreStatus(status: string | undefined): StoreOrderStatus {
   return "awaiting_payment";
 }
 
+type MercadoPagoApiError = Error & { mercadoPagoStatus?: number; mercadoPagoCode?: string; mercadoPagoCause?: string };
+
 async function mercadoFetch(path: string, init: RequestInit = {}) {
   const response = await fetch(`https://api.mercadopago.com${path}`, { ...init, headers: { Authorization: `Bearer ${accessToken()}`, "Content-Type": "application/json", ...(init.headers ?? {}) } });
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(`Mercado Pago no pudo procesar el pago (${response.status}).`);
+  if (!response.ok) {
+    const error = new Error(`Mercado Pago no pudo procesar el pago (${response.status}).`) as MercadoPagoApiError;
+    error.mercadoPagoStatus = response.status;
+    error.mercadoPagoCode = typeof (body as { error?: unknown }).error === "string" ? (body as { error: string }).error : undefined;
+    error.mercadoPagoCause = typeof (body as { message?: unknown }).message === "string" ? (body as { message: string }).message : undefined;
+    console.warn("[Mercado Pago payment]", { status: error.mercadoPagoStatus, code: error.mercadoPagoCode ?? "unknown", cause: error.mercadoPagoCause ?? "unknown" });
+    throw error;
+  }
   return body as MercadoPayment;
 }
 

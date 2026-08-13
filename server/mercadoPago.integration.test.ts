@@ -59,6 +59,15 @@ describe("flujo integrado Mercado Pago", () => {
     } finally { await removeTestOrder(db, order.id); }
   });
 
+  it("devuelve un diagnóstico seguro cuando Mercado Pago rechaza la solicitud", async () => {
+    const { db, order } = await createTestOrder();
+    global.fetch = vi.fn(async () => new Response(JSON.stringify({ error: "unauthorized", message: "invalid_token" }), { status: 401, headers: { "Content-Type": "application/json" } })) as typeof fetch;
+    const caller = appRouter.createCaller({ user: null, req: { protocol: "https", headers: {}, get: () => "localhost" } as TrpcContext["req"], res: {} as TrpcContext["res"] });
+    try {
+      await expect(caller.checkout.pay({ orderId: order.id, token: "test-payment-token-401", paymentMethodId: "visa", installments: 1, payerEmail: "buyer-test@example.com" })).rejects.toThrow(/unauthorized/);
+    } finally { await removeTestOrder(db, order.id); }
+  });
+
   it("rechaza webhook sin firma y sincroniza uno firmado", async () => {
     const { db, order } = await createTestOrder(); const secret = "webhook-test-secret"; process.env.MERCADOPAGO_WEBHOOK_SECRET = secret;
     global.fetch = vi.fn(async () => new Response(JSON.stringify({ id: 778899, status: "approved", external_reference: order.orderNumber, transaction_amount: order.totalInCents / 100 }), { status: 200, headers: { "Content-Type": "application/json" } })) as typeof fetch;

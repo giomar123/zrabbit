@@ -115,6 +115,18 @@
 - [ ] Probar un pago end-to-end de Mercado Pago en entorno de prueba antes de habilitar producción.
 - [ ] Diagnosticar por qué el SDK o la clave pública de Mercado Pago no está disponible en Railway.
 - [ ] Corregir la carga del Payment Brick y validar su visualización en el checkout publicado.
+- [ ] Agregar VITE_MERCADOPAGO_PUBLIC_KEY con la Public Key de prueba al servicio zRabbit de Railway y redeplegar.
+- [ ] Sustituir cualquier credencial productiva de Mercado Pago por claves de prueba antes de seguir validando el checkout.
+- [ ] Probar el flujo con cuentas y tarjetas de prueba de Mercado Pago, sin utilizar una tarjeta personal.
+- [ ] Verificar y corregir MERCADOPAGO_ACCESS_TOKEN de prueba en Railway ante el error 401 del checkout.
+- [ ] Revocar o regenerar las credenciales de prueba de Mercado Pago expuestas en la captura.
+- [ ] Sustituir de forma segura en Railway la Public Key y el Access Token regenerados.
+- [ ] Identificar por qué Railway no detecta el Access Token como credencial de prueba y aplicar el valor correcto.
+- [ ] Forzar un redeploy de Railway después de actualizar las credenciales de Mercado Pago.
+- [ ] Confirmar que VITE_MERCADOPAGO_PUBLIC_KEY y MERCADOPAGO_ACCESS_TOKEN provienen de la misma aplicación de prueba.
+- [ ] Añadir diagnóstico seguro para distinguir errores de autorización, token de tarjeta y configuración de Mercado Pago.
+- [ ] Inspeccionar en Railway el resultado de un intento 401 sin revelar tarjetas, claves ni datos personales.
+- [x] Probar que un 401 de Mercado Pago entrega diagnóstico seguro de código y causa al checkout.
 - [x] Recuperar la autenticación de GitHub o utilizar un método alternativo de publicación para desplegar Mercado Pago.
 - [x] Probar el procedimiento checkout.pay mediante tRPC con una respuesta simulada de Mercado Pago.
 - [x] Verificar una segunda ejecución del mismo pedido y token para confirmar la clave de idempotencia usada en cada intento.

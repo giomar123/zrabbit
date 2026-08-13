@@ -1,4 +1,5 @@
 import { and, desc, eq } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { authorizedGoogleEmails, categories, orderItems, orders, productImages, products, users } from "../drizzle/schema";
 import { createPendingOrder, getCatalogProductBySlug, listActiveCategories, listCatalogProducts } from "./catalog";
@@ -51,7 +52,14 @@ export const appRouter = router({
       items: z.array(z.object({ productId: z.number().int().positive(), quantity: z.number().int().min(1).max(10) })).min(1).max(20),
     })).mutation(({ input }) => createPendingOrder(input)),
     webhookStatus: publicProcedure.query(() => ({ configured: isMercadoPagoWebhookConfigured() })),
-    pay: publicProcedure.input(z.object({ orderId: z.number().int().positive(), token: z.string().min(10), paymentMethodId: z.string().min(1), issuerId: z.string().optional(), installments: z.number().int().min(1).max(48), payerEmail: z.string().email(), identificationType: z.string().optional(), identificationNumber: z.string().optional() })).mutation(({ input }) => createMercadoPagoPayment(input)),
+    pay: publicProcedure.input(z.object({ orderId: z.number().int().positive(), token: z.string().min(10), paymentMethodId: z.string().min(1), issuerId: z.string().optional(), installments: z.number().int().min(1).max(48), payerEmail: z.string().email(), identificationType: z.string().optional(), identificationNumber: z.string().optional() })).mutation(async ({ input }) => {
+      try { return await createMercadoPagoPayment(input); }
+      catch (error) {
+        const paymentError = error as Error & { mercadoPagoStatus?: number; mercadoPagoCode?: string; mercadoPagoCause?: string };
+        if (paymentError.mercadoPagoStatus) throw new TRPCError({ code: "BAD_REQUEST", message: JSON.stringify({ provider: "mercado_pago", status: paymentError.mercadoPagoStatus, code: paymentError.mercadoPagoCode ?? "unknown", cause: paymentError.mercadoPagoCause ?? "unknown" }) });
+        throw error;
+      }
+    }),
   }),
   admin: router({
     dashboard: adminProcedure.query(async () => {
