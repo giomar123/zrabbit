@@ -157,6 +157,8 @@
 - [ ] Restaurar el checkout publicado completando la migración 0006 antes de continuar con Yape.
 - [ ] Recuperar `isFreeShipping` en Railway con una operación única sin volver a ejecutar la migración antigua.
 - [ ] Proporcionar una recuperación compatible con consola móvil para la columna faltante del checkout.
+- [ ] Forzar en Railway el despliegue que contiene `pnpm repair:shipping` antes de ejecutarlo.
+- [ ] Adaptar `pnpm repair:shipping` para comprobar INFORMATION_SCHEMA sin usar IF NOT EXISTS en MySQL Railway.
 - [ ] Crear un producto de prueba de Yape a S/ 10 con una excepción controlada al pedido mínimo.
 - [ ] Mantener el pedido mínimo de S/ 99 para cualquier carrito que contenga productos reales.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.
