@@ -15,7 +15,7 @@
 - [x] Añadir operaciones administrativas para crear, ordenar, editar y retirar las referencias de imágenes de producto.
 - [x] Conectar los filtros visibles del catálogo a categoría, rango de precios y disponibilidad reales.
 - [x] Añadir metadatos por producto verificables para compartir en Meta, URL canónica y datos estructurados.
-- [ ] Sustituir la reserva de pedido por el checkout real embebido de Mercado Pago y su resultado de pago.
+- [x] Sustituir la reserva de pedido por el checkout real embebido de Mercado Pago y su resultado de pago.
 - [x] Completar en el panel la edición de texto alternativo y el orden de las imágenes de cada producto.
 - [x] Añadir fundamentos para analítica y campañas por producto: URLs canónicas, Open Graph, datos estructurados y eventos de conversión preparados.
 - [x] Añadir configuración, guías y archivos necesarios para trabajar con GitHub y Railway.
@@ -51,16 +51,16 @@
 - [x] Verificar en sesión de administrador las pestañas Productos, Usuarios, Pedidos y Mi cuenta, incluida su adaptación móvil.
 - [x] Documentar por separado la evidencia de panel autenticado y de acceso restringido para visitantes.
 - [x] Añadir pruebas de seguridad para los cambios de rol y retiro de usuarios del panel.
-- [ ] Verificar la conexión de base de datos de producción requerida por Railway.
+- [x] Verificar la conexión de base de datos de producción requerida por Railway.
 - [x] Documentar la variable DATABASE_URL y el proceso de migración de tablas en Railway.
 - [ ] Validar que catálogo, pedidos y usuarios se mantengan disponibles tras conectar la base de datos de producción.
-- [ ] Confirmar si Railway usará MySQL compatible con el esquema actual o si se migrará intencionalmente a PostgreSQL.
-- [ ] Configurar DATABASE_URL en el servicio zRabbit como referencia al servicio MySQL online de Railway.
-- [ ] Ejecutar la migración inicial en MySQL Railway y comprobar las tablas creadas.
-- [ ] Corregir la referencia DATABASE_URL ausente en el servicio web de Railway y volver a validar la consola.
-- [ ] Identificar el nombre exacto del servicio MySQL para usarlo en la referencia DATABASE_URL de Railway.
-- [ ] Confirmar en una consola nueva de Railway que DATABASE_URL existe sin exponer su valor.
-- [ ] Confirmar el resultado exitoso de la migración y las tablas creadas en MySQL Railway.
+- [x] Confirmar si Railway usará MySQL compatible con el esquema actual o si se migrará intencionalmente a PostgreSQL.
+- [x] Configurar DATABASE_URL en el servicio zRabbit como referencia al servicio MySQL online de Railway.
+- [x] Ejecutar la migración inicial en MySQL Railway y comprobar las tablas creadas.
+- [x] Corregir la referencia DATABASE_URL ausente en el servicio web de Railway y volver a validar la consola.
+- [x] Identificar el nombre exacto del servicio MySQL para usarlo en la referencia DATABASE_URL de Railway.
+- [x] Confirmar en una consola nueva de Railway que DATABASE_URL existe sin exponer su valor.
+- [x] Confirmar el resultado exitoso de la migración y las tablas creadas en MySQL Railway.
 - [x] Diagnosticar y corregir las rutas de logo y hero que fallan en el despliegue Railway.
 - [x] Preparar una carga inicial idempotente de categoría, Pikachu Select y sus imágenes para MySQL Railway.
 - [ ] Verificar visualmente en Railway los recursos y el catálogo cargado.
@@ -91,8 +91,8 @@
 - [x] Añadir el rol Editor de productos con acceso exclusivo a catálogo, precios, stock e imágenes.
 - [x] Permitir asignar Administrador o Editor de productos al autorizar un Gmail.
 - [x] Proteger usuarios, Gmail autorizados, pedidos y cuenta para que solo Administradores los gestionen.
-- [ ] Aplicar en Railway la migración de Gmail autorizados que falta y validar la adición de un correo.
-- [ ] Inspeccionar en Railway la tabla __drizzle_migrations y confirmar si existen authorizedGoogleEmails y su columna role.
+- [ ] Confirmar en Railway mediante el formulario que un Gmail puede autorizarse correctamente con rol asignado.
+- [ ] Inspeccionar explícitamente en Railway __drizzle_migrations y/o SHOW COLUMNS para confirmar authorizedGoogleEmails y su columna role.
 - [x] Separar la migración de roles MySQL para evitar dos ALTER TABLE en la misma consulta de Railway.
 - [x] Añadir y ejecutar pruebas de permisos del perfil Editor de productos.
 - [x] Ocultar al Editor cualquier control fuera de productos, precios, stock e imágenes, incluida la gestión de categorías.
@@ -113,6 +113,7 @@
 - [x] Probar checkout.pay con API simulada, idempotencia y actualización de pedido verificable.
 - [x] Probar el endpoint de webhook con firma válida e inválida, incluidas sus respuestas HTTP.
 - [ ] Probar un pago end-to-end de Mercado Pago en entorno de prueba antes de habilitar producción.
+- [x] Recuperar la autenticación de GitHub o utilizar un método alternativo de publicación para desplegar Mercado Pago.
 - [x] Probar el procedimiento checkout.pay mediante tRPC con una respuesta simulada de Mercado Pago.
 - [x] Verificar una segunda ejecución del mismo pedido y token para confirmar la clave de idempotencia usada en cada intento.
 - [ ] Configurar las credenciales y URL pública de Mercado Pago en Railway.
