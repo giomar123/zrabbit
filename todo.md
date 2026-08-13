@@ -40,4 +40,6 @@
 - [x] Sincronizar en GitHub la imagen hero generada y su integración en la portada.
 - [x] Alojar el logo zRabbit de forma persistente para usarlo en la tienda.
 - [x] Reemplazar la marca Figura Fiebre por zRabbit en cabecera, pie de página y metadatos.
-- [ ] Verificar la identidad zRabbit en escritorio y móvil y sincronizarla en GitHub.
+- [x] Verificar la identidad zRabbit en escritorio y móvil y sincronizarla en GitHub.
+- [x] Crear una versión favicon del logo zRabbit y alojarla en la configuración pública.
+- [ ] Configurar y verificar el favicon de zRabbit en la pestaña del navegador y sincronizarlo en GitHub.
