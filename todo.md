@@ -150,6 +150,10 @@
 - [x] Mostrar en el carrito el importe restante para alcanzar el pedido mínimo o el envío gratuito.
 - [x] Publicar términos, condiciones de compra y política de envíos mediante Shalom.
 - [ ] Aplicar la migración 0006 de método Shalom y envío gratuito en Railway antes del siguiente despliegue.
+- [ ] Ejecutar la migración 0006 en Railway para restaurar la creación de pedidos publicados.
+- [ ] Separar las sentencias ALTER TABLE de la migración 0006 para compatibilidad con MySQL Railway.
+- [ ] Crear un producto de prueba de Yape a S/ 10 con una excepción controlada al pedido mínimo.
+- [ ] Mantener el pedido mínimo de S/ 99 para cualquier carrito que contenga productos reales.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.
 - [x] Mostrar en el panel administrativo el historial de notificaciones de pago por pedido.
 - [ ] Configurar en Mercado Pago y Railway la firma de webhooks para el entorno de prueba.
