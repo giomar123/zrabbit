@@ -31,3 +31,7 @@
 - [x] Validar el carrito editorial con la ficha y la portada en el navegador.
 - [x] Cargar las tres fotografías persistentes y publicar el producto de prueba Pikachu Select a S/ 95.
 - [x] Verificar en escritorio y móvil el rediseño inspirado en la referencia proporcionada.
+- [x] Sustituir la imagen hero por la escena de estanterías de figuras aportada por el usuario.
+- [x] Ajustar la paleta a grafito, azul noche y ámbar, manteniendo legibilidad y contraste.
+- [x] Verificar la portada ambiental en escritorio y móvil y sincronizar el ajuste en GitHub.
+- [ ] Sincronizar la portada de estanterías y la paleta grafito, azul noche y ámbar en GitHub.
