@@ -20,6 +20,12 @@ function loadMercadoPagoSdk() {
   });
 }
 
+async function shortFingerprint(value: string) {
+  const bytes = new TextEncoder().encode(value);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, "0")).join("").slice(0, 12);
+}
+
 export function MercadoPagoPaymentBrick({ order, onResult }: { order: { id: number; totalInCents: number; customerEmail: string }; onResult: (result: PaymentResult) => void }) {
   const brickRef = useRef<{ unmount: () => void } | null>(null);
   const [ready, setReady] = useState(false);
@@ -41,7 +47,9 @@ export function MercadoPagoPaymentBrick({ order, onResult }: { order: { id: numb
         onError: (brickError: unknown) => { console.error("[Mercado Pago Brick]", brickError); if (active) setError("No fue posible cargar los medios de pago."); },
         onSubmit: ({ formData }: { formData: Record<string, any> }) => new Promise<void>((resolve, reject) => {
           const payer = formData.payer ?? {};
-          pay.mutate({ orderId: order.id, token: String(formData.token ?? ""), paymentMethodId: String(formData.payment_method_id ?? ""), issuerId: formData.issuer_id ? String(formData.issuer_id) : undefined, installments: Number(formData.installments ?? 1), payerEmail: String(payer.email ?? order.customerEmail), identificationType: payer.identification_type ? String(payer.identification_type) : undefined, identificationNumber: payer.identification_number ? String(payer.identification_number) : undefined }, { onSuccess: result => { onResult(result); resolve(); }, onError: paymentError => { let message = paymentError.message; try { const detail = JSON.parse(message) as { status?: number; code?: string; cause?: string }; message = `Mercado Pago respondió ${detail.status ?? "con un error"}: ${detail.code ?? detail.cause ?? "revisa las credenciales y la tarjeta de prueba"}.`; } catch {} setError(message); reject(paymentError); } });
+          void shortFingerprint(key).then(clientPublicKeyFingerprint => {
+            pay.mutate({ orderId: order.id, token: String(formData.token ?? ""), paymentMethodId: String(formData.payment_method_id ?? ""), issuerId: formData.issuer_id ? String(formData.issuer_id) : undefined, installments: Number(formData.installments ?? 1), payerEmail: String(payer.email ?? order.customerEmail), identificationType: payer.identification_type ? String(payer.identification_type) : undefined, identificationNumber: payer.identification_number ? String(payer.identification_number) : undefined, clientPublicKeyPrefix: key.slice(0, 12), clientPublicKeyFingerprint }, { onSuccess: result => { onResult(result); resolve(); }, onError: paymentError => { let message = paymentError.message; try { const detail = JSON.parse(message) as { status?: number; code?: string; cause?: string }; message = `Mercado Pago respondió ${detail.status ?? "con un error"}: ${detail.code ?? detail.cause ?? "revisa las credenciales y la tarjeta de prueba"}.`; } catch {} setError(message); reject(paymentError); } });
+          }).catch(error => { setError("No fue posible verificar la configuración del pago."); reject(error); });
         }),
       },
     }).then(brick => { if (brick) brickRef.current = brick; });

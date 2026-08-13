@@ -52,7 +52,7 @@ export const appRouter = router({
       items: z.array(z.object({ productId: z.number().int().positive(), quantity: z.number().int().min(1).max(10) })).min(1).max(20),
     })).mutation(({ input }) => createPendingOrder(input)),
     webhookStatus: publicProcedure.query(() => ({ configured: isMercadoPagoWebhookConfigured() })),
-    pay: publicProcedure.input(z.object({ orderId: z.number().int().positive(), token: z.string().min(10), paymentMethodId: z.string().min(1), issuerId: z.string().optional(), installments: z.number().int().min(1).max(48), payerEmail: z.string().email(), identificationType: z.string().optional(), identificationNumber: z.string().optional() })).mutation(async ({ input }) => {
+    pay: publicProcedure.input(z.object({ orderId: z.number().int().positive(), token: z.string().min(10), paymentMethodId: z.string().min(1), issuerId: z.string().optional(), installments: z.number().int().min(1).max(48), payerEmail: z.string().email(), identificationType: z.string().optional(), identificationNumber: z.string().optional(), clientPublicKeyPrefix: z.string().max(12).optional(), clientPublicKeyFingerprint: z.string().regex(/^[a-f0-9]{12}$/).optional() })).mutation(async ({ input }) => {
       try { return await createMercadoPagoPayment(input); }
       catch (error) {
         const paymentError = error as Error & { mercadoPagoStatus?: number; mercadoPagoCode?: string; mercadoPagoCause?: string };

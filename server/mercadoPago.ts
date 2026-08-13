@@ -21,6 +21,21 @@ function toStoreStatus(status: string | undefined): StoreOrderStatus {
 
 type MercadoPagoApiError = Error & { mercadoPagoStatus?: number; mercadoPagoCode?: string; mercadoPagoCause?: string };
 
+function fingerprint(value: string | undefined) {
+  return value ? createHash("sha256").update(value).digest("hex").slice(0, 12) : null;
+}
+
+export function getMercadoPagoSafeTrace(input: { cardToken?: string; clientPublicKeyPrefix?: string; clientPublicKeyFingerprint?: string }) {
+  const configuredPublicKey = process.env.VITE_MERCADOPAGO_PUBLIC_KEY;
+  const configuredAccessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  return {
+    cardToken: { present: Boolean(input.cardToken), fingerprint: fingerprint(input.cardToken) },
+    clientPublicKey: { prefix: input.clientPublicKeyPrefix?.slice(0, 12) ?? null, fingerprint: input.clientPublicKeyFingerprint ?? null },
+    serverPublicKey: { configured: Boolean(configuredPublicKey), prefix: configuredPublicKey?.slice(0, 12) ?? null, fingerprint: fingerprint(configuredPublicKey) },
+    accessToken: { configured: Boolean(configuredAccessToken), prefix: configuredAccessToken?.slice(0, 12) ?? null, fingerprint: fingerprint(configuredAccessToken) },
+  };
+}
+
 async function mercadoFetch(path: string, init: RequestInit = {}) {
   const response = await fetch(`https://api.mercadopago.com${path}`, { ...init, headers: { Authorization: `Bearer ${accessToken()}`, "Content-Type": "application/json", ...(init.headers ?? {}) } });
   const body = await response.json().catch(() => ({}));
@@ -55,14 +70,22 @@ export function verifyMercadoPagoWebhookSignature(input: { signature?: string; r
   return received.length === expected.length && timingSafeEqual(Buffer.from(received), Buffer.from(expected));
 }
 
-export async function createMercadoPagoPayment(input: { orderId: number; token: string; paymentMethodId: string; issuerId?: string; installments: number; payerEmail: string; identificationType?: string; identificationNumber?: string }) {
+export async function createMercadoPagoPayment(input: { orderId: number; token: string; paymentMethodId: string; issuerId?: string; installments: number; payerEmail: string; identificationType?: string; identificationNumber?: string; clientPublicKeyPrefix?: string; clientPublicKeyFingerprint?: string }) {
   const db = await getDb(); if (!db) throw new Error("La base de datos no está disponible.");
   const order = (await db.select().from(orders).where(eq(orders.id, input.orderId)).limit(1))[0];
   if (!order) throw new Error("El pedido no existe.");
   if (order.status === "paid") throw new Error("Este pedido ya fue pagado.");
   const payer = { email: input.payerEmail, ...(input.identificationType && input.identificationNumber ? { identification: { type: input.identificationType, number: input.identificationNumber } } : {}) };
   const idempotencyKey = createHash("sha256").update(`${order.orderNumber}:${input.token}`).digest("hex");
-  const payment = await mercadoFetch("/v1/payments", { method: "POST", headers: { "X-Idempotency-Key": idempotencyKey }, body: JSON.stringify({ transaction_amount: order.totalInCents / 100, token: input.token, description: `zRabbit · ${order.orderNumber}`, installments: input.installments, payment_method_id: input.paymentMethodId, ...(input.issuerId ? { issuer_id: input.issuerId } : {}), payer, external_reference: order.orderNumber }) });
+  let payment: MercadoPayment;
+  try {
+    payment = await mercadoFetch("/v1/payments", {
+      method: "POST",
+      headers: { "X-Idempotency-Key": idempotencyKey },
+      body: JSON.stringify({ transaction_amount: order.totalInCents / 100, token: input.token, description: `zRabbit · ${order.orderNumber}`, installments: input.installments, payment_method_id: input.paymentMethodId, ...(input.issuerId ? { issuer_id: input.issuerId } : {}), payer, external_reference: order.orderNumber }),
+    });
+  }
+  catch (error) { console.warn("[Mercado Pago credential trace]", getMercadoPagoSafeTrace({ cardToken: input.token, clientPublicKeyPrefix: input.clientPublicKeyPrefix, clientPublicKeyFingerprint: input.clientPublicKeyFingerprint })); throw error; }
   const status = toStoreStatus(payment.status);
   await db.update(orders).set({ status, mercadoPagoPaymentId: payment.id ? String(payment.id) : null, mercadoPagoStatus: payment.status ?? null }).where(eq(orders.id, order.id));
   return { orderNumber: order.orderNumber, paymentId: payment.id ? String(payment.id) : null, status, mercadoPagoStatus: payment.status ?? "pending", detail: payment.status_detail ?? null };

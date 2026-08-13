@@ -121,11 +121,20 @@
 - [ ] Verificar y corregir MERCADOPAGO_ACCESS_TOKEN de prueba en Railway ante el error 401 del checkout.
 - [ ] Revocar o regenerar las credenciales de prueba de Mercado Pago expuestas en la captura.
 - [ ] Sustituir de forma segura en Railway la Public Key y el Access Token regenerados.
-- [ ] Identificar por qué Railway no detecta el Access Token como credencial de prueba y aplicar el valor correcto.
+- [x] Identificar por qué Railway no detecta el Access Token como credencial de prueba y aplicar el valor correcto.
 - [ ] Forzar un redeploy de Railway después de actualizar las credenciales de Mercado Pago.
 - [ ] Confirmar que VITE_MERCADOPAGO_PUBLIC_KEY y MERCADOPAGO_ACCESS_TOKEN provienen de la misma aplicación de prueba.
 - [ ] Añadir diagnóstico seguro para distinguir errores de autorización, token de tarjeta y configuración de Mercado Pago.
-- [ ] Inspeccionar en Railway el resultado de un intento 401 sin revelar tarjetas, claves ni datos personales.
+- [x] Inspeccionar en Railway el resultado de un intento 401 sin revelar tarjetas, claves ni datos personales.
+- [x] Obtener desde el navegador habitual del propietario la línea saneada de Railway con status, code y cause del intento 401.
+- [x] Documentar la evidencia saneada del log: `[Mercado Pago payment] { status: 401, code: unauthorized, cause: Unauthorized use of live credentials }`.
+- [ ] Reemplazar en Railway las credenciales live por la Public Key y el Access Token de prueba de la misma aplicación de Mercado Pago.
+- [x] Verificar en Railway el alcance, origen y huella no reversible de MERCADOPAGO_ACCESS_TOKEN sin revelar su valor.
+- [ ] Comparar de forma no reversible la VITE_MERCADOPAGO_PUBLIC_KEY compilada en el frontend con la variable de Railway.
+- [ ] Verificar visualmente que ambas credenciales proceden de la sección Pruebas de la misma aplicación de Mercado Pago.
+- [ ] Auditar de forma segura la clave pública efectiva y el token generado por el Payment Brick durante una prueba.
+- [ ] Verificar que la aplicación de Mercado Pago esté habilitada para el producto Payment Brick o Checkout API usado por zRabbit.
+- [ ] Registrar sin datos sensibles la huella del token generado por el Payment Brick y de la Public Key usada en el intento de pago.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.
 - [x] Mostrar en el panel administrativo el historial de notificaciones de pago por pedido.
 - [ ] Configurar en Mercado Pago y Railway la firma de webhooks para el entorno de prueba.
