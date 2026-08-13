@@ -12,6 +12,13 @@ export const users = mysqlTable("users", {
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
+export const authorizedGoogleEmails = mysqlTable("authorizedGoogleEmails", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull(),
+  createdByUserId: int("createdByUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => [uniqueIndex("authorized_google_emails_email_uq").on(table.email)]);
+
 export const categories = mysqlTable("categories", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
@@ -95,6 +102,7 @@ export const orderItems = mysqlTable("orderItems", {
 }, table => [index("order_items_order_idx").on(table.orderId)]);
 
 export type User = typeof users.$inferSelect;
+export type AuthorizedGoogleEmail = typeof authorizedGoogleEmails.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Category = typeof categories.$inferSelect;
 export type Product = typeof products.$inferSelect;

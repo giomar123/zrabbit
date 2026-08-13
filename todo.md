@@ -84,3 +84,7 @@
 - [x] Validar las credenciales Google OAuth registradas mediante el estado seguro de configuración.
 - [ ] Configurar la pantalla de consentimiento de Google OAuth para zRabbit antes de crear la credencial web.
 - [x] Confirmar el modelo de autenticación final tras evaluar seguridad y mantenimiento de Google OAuth frente a acceso local.
+- [x] Crear una lista permitida de Gmail para Google OAuth sin acceso implícito para otras cuentas.
+- [x] Añadir al panel la creación y retiro seguro de Gmail autorizados.
+- [x] Validar que una cuenta Google no autorizada reciba rechazo aunque tenga el enlace de acceso.
+- [x] Añadir y ejecutar pruebas de la lista permitida de Gmail y del rechazo por rol insuficiente.

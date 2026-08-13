@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { authorizedGoogleEmails, InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -87,6 +87,14 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+export async function isGoogleEmailAuthorized(email: string) {
+  const db = await getDb();
+  if (!db) return false;
+  const normalized = email.trim().toLowerCase();
+  const result = await db.select({ id: authorizedGoogleEmails.id }).from(authorizedGoogleEmails).where(eq(authorizedGoogleEmails.email, normalized)).limit(1);
+  return result.length > 0;
 }
 
 // TODO: add feature queries here as your schema grows.

@@ -1,6 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { categories, orderItems, orders, productImages, products, users } from "../drizzle/schema";
+import { authorizedGoogleEmails, categories, orderItems, orders, productImages, products, users } from "../drizzle/schema";
 import { createPendingOrder, getCatalogProductBySlug, listActiveCategories, listCatalogProducts } from "./catalog";
 import { getDb } from "./db";
 import { storagePut } from "./storage";
@@ -78,6 +78,20 @@ export const appRouter = router({
         const db = await requireDb();
         await db.delete(users).where(eq(users.id, input.id));
         return { success: true };
+      }),
+    }),
+    googleAccess: router({
+      list: adminProcedure.query(async () => { const db = await requireDb(); return db.select().from(authorizedGoogleEmails).orderBy(desc(authorizedGoogleEmails.createdAt)); }),
+      add: adminProcedure.input(z.object({ email: z.string().trim().email().max(320) })).mutation(async ({ ctx, input }) => {
+        const db = await requireDb(); const email = input.email.toLowerCase();
+        await db.insert(authorizedGoogleEmails).values({ email, createdByUserId: ctx.user.id }).onDuplicateKeyUpdate({ set: { email } });
+        return { success: true, email };
+      }),
+      remove: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+        const db = await requireDb(); const row = await db.select().from(authorizedGoogleEmails).where(eq(authorizedGoogleEmails.id, input.id)).limit(1);
+        if (!row[0]) return { success: true };
+        if (row[0].email === ctx.user.email?.toLowerCase()) throw new Error("No puedes retirar el Gmail de tu sesión actual.");
+        await db.delete(authorizedGoogleEmails).where(eq(authorizedGoogleEmails.id, input.id)); return { success: true };
       }),
     }),
     categories: router({

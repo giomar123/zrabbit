@@ -3,7 +3,7 @@ import type { Express, Request, Response } from "express";
 import { parse as parseCookieHeader } from "cookie";
 import { createRemoteJWKSet, jwtVerify, SignJWT } from "jose";
 import type { User } from "../../drizzle/schema";
-import { getUserByOpenId, upsertUser } from "../db";
+import { getUserByOpenId, isGoogleEmailAuthorized, upsertUser } from "../db";
 import { getSessionCookieOptions } from "./cookies";
 
 const GOOGLE_STATE_COOKIE = "zrabbit_google_state";
@@ -35,7 +35,7 @@ export async function authenticateGoogleAdmin(req: Request): Promise<User | null
   try {
     const { payload } = await jwtVerify(token, key);
     const email = String(payload.email ?? "").toLowerCase(); const openId = String(payload.sub ?? "");
-    if (payload.kind !== "google_admin" || email !== adminEmail || !openId) return null;
+    if (payload.kind !== "google_admin" || !openId || (email !== adminEmail && !(await isGoogleEmailAuthorized(email)))) return null;
     const user = await getUserByOpenId(openId);
     return user?.role === "admin" ? user : null;
   } catch { return null; }
@@ -67,7 +67,8 @@ export function registerGoogleAuthRoutes(app: Express) {
       if (!token.id_token) throw new Error("Google no entregó una identidad válida.");
       const { payload } = await jwtVerify(token.id_token, googleKeys, { audience: clientId, issuer: GOOGLE_ISSUERS });
       const email = String(payload.email ?? "").trim().toLowerCase(); const openId = `google:${String(payload.sub ?? "")}`;
-      if (!payload.sub || payload.nonce !== saved.nonce || payload.email_verified !== true || email !== adminEmail) return res.status(403).send("Esta cuenta Google no está autorizada para administrar zRabbit.");
+      const listed = await isGoogleEmailAuthorized(email);
+      if (!payload.sub || payload.nonce !== saved.nonce || payload.email_verified !== true || (email !== adminEmail && !listed)) return res.status(403).send("Esta cuenta Google no está autorizada para administrar zRabbit.");
       await upsertUser({ openId, name: typeof payload.name === "string" ? payload.name : "Administrador zRabbit", email, loginMethod: "google", role: "admin", lastSignedIn: new Date() });
       const session = await issueSession(openId, email);
       res.cookie(GOOGLE_SESSION_COOKIE, session, { ...getSessionCookieOptions(req), maxAge: 12 * 60 * 60 * 1000 });
