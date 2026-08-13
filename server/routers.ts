@@ -7,6 +7,7 @@ import { storagePut } from "./storage";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { isGoogleAuthConfigured, logoutGoogleAdmin } from "./_core/googleAuth";
+import { createMercadoPagoPayment, isMercadoPagoWebhookConfigured } from "./mercadoPago";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, catalogEditorProcedure, publicProcedure, router } from "./_core/trpc";
 
@@ -49,6 +50,8 @@ export const appRouter = router({
       shippingAddress: z.string().trim().min(8).max(1000).optional(), shippingDistrict: z.string().trim().max(120).optional(),
       items: z.array(z.object({ productId: z.number().int().positive(), quantity: z.number().int().min(1).max(10) })).min(1).max(20),
     })).mutation(({ input }) => createPendingOrder(input)),
+    webhookStatus: publicProcedure.query(() => ({ configured: isMercadoPagoWebhookConfigured() })),
+    pay: publicProcedure.input(z.object({ orderId: z.number().int().positive(), token: z.string().min(10), paymentMethodId: z.string().min(1), issuerId: z.string().optional(), installments: z.number().int().min(1).max(48), payerEmail: z.string().email(), identificationType: z.string().optional(), identificationNumber: z.string().optional() })).mutation(({ input }) => createMercadoPagoPayment(input)),
   }),
   admin: router({
     dashboard: adminProcedure.query(async () => {

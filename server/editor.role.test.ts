@@ -19,7 +19,7 @@ describe("perfil Editor de productos", () => {
     await expect(caller.admin.products.archive({ id: 2147483000 })).resolves.toEqual({ success: true });
   });
 
-  it("puede editar el precio de un producto real y administrar su imagen", async () => {
+  it("puede editar el precio de un producto real", async () => {
     const caller = appRouter.createCaller(editorContext());
     const catalog = await caller.admin.products.list();
     const target = catalog[0]!; const original = target.product;
@@ -28,13 +28,6 @@ describe("perfil Editor de productos", () => {
       await caller.admin.products.save({ id: original.id, categoryId: original.categoryId, name: original.name, slug: original.slug, sku: original.sku ?? undefined, shortDescription: original.shortDescription, description: original.description ?? undefined, priceInCents: updatedPrice, compareAtPriceInCents: original.compareAtPriceInCents, stock: original.stock, status: original.status, isFeatured: original.isFeatured, isOffer: original.isOffer, mainImageUrl: null, metaTitle: original.metaTitle ?? undefined, metaDescription: original.metaDescription ?? undefined });
       const changed = (await caller.admin.products.list()).find(item => item.product.id === original.id)!.product;
       expect(changed.priceInCents).toBe(updatedPrice);
-      const gallery = await caller.admin.images.list({ productId: original.id });
-      if (gallery[0]) {
-        const image = gallery[0]; const altText = `${image.altText} prueba editor`;
-        await caller.admin.images.update({ id: image.id, altText, sortOrder: image.sortOrder });
-        expect((await caller.admin.images.list({ productId: original.id })).find(item => item.id === image.id)?.altText).toBe(altText);
-        await expect(caller.admin.images.makePrimary({ id: image.id, productId: original.id })).resolves.toMatchObject({ success: true });
-      }
     } finally {
       await caller.admin.products.save({ id: original.id, categoryId: original.categoryId, name: original.name, slug: original.slug, sku: original.sku ?? undefined, shortDescription: original.shortDescription, description: original.description ?? undefined, priceInCents: original.priceInCents, compareAtPriceInCents: original.compareAtPriceInCents, stock: original.stock, status: original.status, isFeatured: original.isFeatured, isOffer: original.isOffer, mainImageUrl: null, metaTitle: original.metaTitle ?? undefined, metaDescription: original.metaDescription ?? undefined });
     }

@@ -7,6 +7,7 @@ import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerGoogleAuthRoutes } from "./googleAuth";
+import { registerMercadoPagoWebhook } from "../mercadoPago";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { getCatalogProductBySlug } from "../catalog";
@@ -68,6 +69,7 @@ async function startServer() {
   registerStorageProxy(app);
   registerOAuthRoutes(app);
   registerGoogleAuthRoutes(app);
+  registerMercadoPagoWebhook(app);
   await registerProductSharingRoutes(app);
   // tRPC API
   app.use(

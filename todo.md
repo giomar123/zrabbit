@@ -104,3 +104,17 @@
 - [x] Verificar en una sesión Editor que la pestaña Productos no muestra la gestión de categorías.
 - [x] Ejecutar una prueba reversible de carga y retiro de imagen con el perfil Editor.
 - [x] Confirmar explícitamente que la prueba temporal del Editor queda archivada como limpieza controlada.
+- [x] Crear pagos de Mercado Pago desde el servidor para pedidos reales, verificando el total almacenado.
+- [x] Integrar el checkout de Mercado Pago dentro del recorrido de compra.
+- [x] Procesar y verificar notificaciones de pago para actualizar los pedidos.
+- [x] Añadir verificación real de firma x-signature con el secreto de webhooks de Mercado Pago.
+- [x] Probar el webhook firmado y rechazar una notificación manipulada.
+- [ ] Configurar el secreto y la URL de Webhooks de Mercado Pago para el entorno de prueba en Railway.
+- [x] Probar checkout.pay con API simulada, idempotencia y actualización de pedido verificable.
+- [x] Probar el endpoint de webhook con firma válida e inválida, incluidas sus respuestas HTTP.
+- [ ] Probar un pago end-to-end de Mercado Pago en entorno de prueba antes de habilitar producción.
+- [x] Probar el procedimiento checkout.pay mediante tRPC con una respuesta simulada de Mercado Pago.
+- [x] Verificar una segunda ejecución del mismo pedido y token para confirmar la clave de idempotencia usada en cada intento.
+- [ ] Configurar las credenciales y URL pública de Mercado Pago en Railway.
+- [ ] Probar pagos en entorno de prueba antes de habilitar credenciales de producción.
+- [x] Validar las credenciales de prueba de Mercado Pago sin crear pagos.
