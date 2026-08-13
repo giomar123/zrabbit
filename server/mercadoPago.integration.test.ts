@@ -66,6 +66,15 @@ describe("flujo integrado Mercado Pago", () => {
     } finally { await removeTestOrder(db, order.id, productId, originalStock); }
   });
 
+  it("envía Yape como método de pago separado con una cuota", async () => {
+    const { db, order, productId, originalStock } = await createTestOrder(); const calls: RequestInit[] = [];
+    global.fetch = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => { calls.push(init ?? {}); return new Response(JSON.stringify({ id: 998877, status: "in_process", status_detail: "pending_waiting_payment" }), { status: 201, headers: { "Content-Type": "application/json" } }); }) as typeof fetch;
+    try {
+      await createMercadoPagoPayment({ orderId: order.id, token: "test-yape-token-123456", paymentMethodId: "yape", installments: 1, payerEmail: "buyer-test@example.com" });
+      expect(JSON.parse(String(calls[0]?.body))).toMatchObject({ payment_method_id: "yape", installments: 1, transaction_amount: order.totalInCents / 100 });
+    } finally { await removeTestOrder(db, order.id, productId, originalStock); }
+  });
+
   it("devuelve un diagnóstico seguro cuando Mercado Pago rechaza la solicitud", async () => {
     const { db, order, productId, originalStock } = await createTestOrder();
     global.fetch = vi.fn(async () => new Response(JSON.stringify({ error: "unauthorized", message: "invalid_token" }), { status: 401, headers: { "Content-Type": "application/json" } })) as typeof fetch;

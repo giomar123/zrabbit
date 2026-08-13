@@ -6,8 +6,10 @@ export type CatalogFilters = { categorySlug?: string; minPrice?: number; maxPric
 
 export const MINIMUM_ORDER_IN_CENTS = 9_900;
 export const FREE_SHIPPING_THRESHOLD_IN_CENTS = 19_900;
+export const YAPE_TEST_PRODUCT_SLUG = "prueba-yape-s10";
 
-export function validateMinimumOrder(totalInCents: number) {
+export function validateMinimumOrder(totalInCents: number, isYapeTestOnly = false) {
+  if (isYapeTestOnly) return;
   if (totalInCents < MINIMUM_ORDER_IN_CENTS) throw new Error("El pedido mínimo es de S/ 99.00.");
 }
 
@@ -30,7 +32,7 @@ export async function listActiveCategories() {
 export async function listCatalogProducts(filters: CatalogFilters = {}) {
   const db = await getDb();
   if (!db) return [];
-  const conditions = [eq(products.status, "active")];
+  const conditions = [eq(products.status, "active"), eq(categories.isActive, true)];
   if (filters.categorySlug) conditions.push(eq(categories.slug, filters.categorySlug));
   if (filters.minPrice !== undefined) conditions.push(gte(products.priceInCents, filters.minPrice));
   if (filters.maxPrice !== undefined) conditions.push(lte(products.priceInCents, filters.maxPrice));
@@ -62,9 +64,10 @@ export async function createPendingOrder(input: { customerName: string; customer
     return { product, quantity: item.quantity, subtotal: product.priceInCents * item.quantity };
   });
   const totalInCents = enriched.reduce((sum, item) => sum + item.subtotal, 0);
-  validateMinimumOrder(totalInCents);
+  const isYapeTestOnly = enriched.length > 0 && enriched.every(item => item.product.slug === YAPE_TEST_PRODUCT_SLUG);
+  validateMinimumOrder(totalInCents, isYapeTestOnly);
   const orderNumber = `FC-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-  const result = await db.insert(orders).values({ orderNumber, customerName: input.customerName, customerEmail: input.customerEmail, customerPhone: input.customerPhone, shippingAddress: input.shippingAddress, shippingDistrict: input.shippingDistrict, shippingMethod: "shalom", isFreeShipping: qualifiesForFreeShipping(totalInCents), totalInCents, status: "awaiting_payment" });
+  const result = await db.insert(orders).values({ orderNumber, customerName: input.customerName, customerEmail: input.customerEmail, customerPhone: input.customerPhone, shippingAddress: input.shippingAddress, shippingDistrict: input.shippingDistrict, shippingMethod: isYapeTestOnly ? "yape_test" : "shalom", isFreeShipping: isYapeTestOnly || qualifiesForFreeShipping(totalInCents), totalInCents, status: "awaiting_payment" });
   const orderId = Number(result[0].insertId);
   await db.insert(orderItems).values(enriched.map(({ product, quantity, subtotal }) => ({ orderId, productId: product.id, productName: product.name, imageUrl: product.mainImageUrl, unitPriceInCents: product.priceInCents, quantity, subtotalInCents: subtotal })));
   return { id: orderId, orderNumber, totalInCents, items: enriched };

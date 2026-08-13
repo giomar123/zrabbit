@@ -1,9 +1,9 @@
 import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 declare global {
-  interface Window { MercadoPago?: new (publicKey: string, options?: { locale?: string }) => { bricks: () => { create: (type: string, container: string, settings: any) => Promise<{ unmount: () => void }> } } }
+  interface Window { MercadoPago?: new (publicKey: string, options?: { locale?: string }) => { bricks: () => { create: (type: string, container: string, settings: any) => Promise<{ unmount: () => void }> }; yape: (input: { phoneNumber: string; otp: string }) => { create: () => Promise<{ id?: string; token?: string }> } } }
 }
 
 type PaymentResult = { status: "awaiting_payment" | "paid" | "cancelled"; detail: string | null; orderNumber: string };
@@ -30,6 +30,10 @@ export function MercadoPagoPaymentBrick({ order, onResult }: { order: { id: numb
   const brickRef = useRef<{ unmount: () => void } | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentMode, setPaymentMode] = useState<"card" | "yape">("card");
+  const [yapePhone, setYapePhone] = useState("");
+  const [yapeOtp, setYapeOtp] = useState("");
+  const [yapeLoading, setYapeLoading] = useState(false);
   const pay = trpc.checkout.pay.useMutation();
 
   useEffect(() => {
@@ -57,5 +61,27 @@ export function MercadoPagoPaymentBrick({ order, onResult }: { order: { id: numb
     return () => { active = false; brickRef.current?.unmount(); brickRef.current = null; };
   }, [order.id, order.totalInCents, order.customerEmail]);
 
-  return <section className="mt-6 rounded-xl border border-[#deded7] bg-white p-5"><div className="flex items-center gap-2"><div><p className="editorial-label">Pago seguro</p><h2 className="mt-1 font-serif text-2xl">Elige cómo pagar</h2></div>{!ready && !error && <Loader2 className="ml-auto animate-spin" size={20} />}</div><p className="mt-2 text-xs leading-relaxed text-ink/60">Los datos de pago se procesan directamente con Mercado Pago.</p>{error && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}<div id="mercadoPagoPaymentBrick" className="mt-5" /></section>;
+  const submitYape = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const key = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY as string | undefined;
+    if (!key) { setError("Falta la clave pública de Mercado Pago para Yape."); return; }
+    if (!/^\d{9}$/.test(yapePhone) || !/^\d{6}$/.test(yapeOtp)) { setError("Ingresa un celular peruano de 9 dígitos y el OTP de 6 dígitos de Yape."); return; }
+    setYapeLoading(true); setError(null);
+    try {
+      await loadMercadoPagoSdk();
+      if (!window.MercadoPago) throw new Error("El SDK de Mercado Pago no está disponible.");
+      const mp = new window.MercadoPago(key, { locale: "es-PE" });
+      const tokenized = await mp.yape({ phoneNumber: yapePhone, otp: yapeOtp }).create();
+      const token = String(tokenized.id ?? tokenized.token ?? "");
+      if (token.length < 10) throw new Error("Mercado Pago no devolvió un token válido de Yape.");
+      const clientPublicKeyFingerprint = await shortFingerprint(key);
+      pay.mutate({ orderId: order.id, token, paymentMethodId: "yape", installments: 1, payerEmail: order.customerEmail, clientPublicKeyPrefix: key.slice(0, 12), clientPublicKeyFingerprint }, {
+        onSuccess: result => onResult(result),
+        onError: paymentError => { let message = paymentError.message; try { const detail = JSON.parse(message) as { status?: number; code?: string; cause?: string }; message = `Mercado Pago respondió ${detail.status ?? "con un error"}: ${detail.code ?? detail.cause ?? "revisa Yape"}.`; } catch {} setError(message); },
+        onSettled: () => setYapeLoading(false),
+      });
+    } catch (yapeError) { setError(yapeError instanceof Error ? yapeError.message : "No fue posible preparar Yape."); setYapeLoading(false); }
+  };
+
+  return <section className="mt-6 rounded-xl border border-[#deded7] bg-white p-5"><div className="flex items-center gap-2"><div><p className="editorial-label">Pago seguro</p><h2 className="mt-1 font-serif text-2xl">Elige cómo pagar</h2></div>{!ready && !error && <Loader2 className="ml-auto animate-spin" size={20} />}</div><p className="mt-2 text-xs leading-relaxed text-ink/60">Los datos de pago se procesan directamente con Mercado Pago.</p><div className="mt-5 grid grid-cols-2 border border-[#deded7] p-1"><button type="button" onClick={() => setPaymentMode("card")} className={`px-3 py-2 text-xs font-extrabold uppercase tracking-[.11em] ${paymentMode === "card" ? "bg-ink text-white" : "text-ink/65"}`}>Tarjeta</button><button type="button" onClick={() => setPaymentMode("yape")} className={`px-3 py-2 text-xs font-extrabold uppercase tracking-[.11em] ${paymentMode === "yape" ? "bg-[#6827c7] text-white" : "text-ink/65"}`}>Yape</button></div>{error && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}<div className={paymentMode === "card" ? "mt-5" : "hidden"}><div id="mercadoPagoPaymentBrick" /></div>{paymentMode === "yape" && <form onSubmit={submitYape} className="mt-5 space-y-4"><div className="rounded-lg bg-[#f7f0ff] p-4 text-sm leading-relaxed text-[#3c1772]"><strong>Paga con Yape de forma segura.</strong> Ingresa el número y código OTP que Yape te solicite. zRabbit no almacena estos datos.</div><label className="form-label">Celular Yape<input required inputMode="numeric" maxLength={9} value={yapePhone} onChange={event => setYapePhone(event.target.value.replace(/\D/g, "").slice(0, 9))} className="form-input" placeholder="999 999 999" /></label><label className="form-label">Código OTP<input required inputMode="numeric" maxLength={6} value={yapeOtp} onChange={event => setYapeOtp(event.target.value.replace(/\D/g, "").slice(0, 6))} className="form-input" placeholder="Código de 6 dígitos" /></label><button disabled={yapeLoading || pay.isPending} className="memphis-button w-full bg-[#6827c7] text-white disabled:opacity-50">{yapeLoading || pay.isPending ? "Procesando Yape..." : "Pagar con Yape"}</button><p className="text-xs leading-relaxed text-ink/55">En la prueba oficial se usa el celular 111111111 y OTP 123456. Para un cobro real, usa tus datos de Yape.</p></form>}</section>;
 }

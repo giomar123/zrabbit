@@ -22,6 +22,11 @@ describe("reglas de catálogo para pedidos", () => {
     expect(() => validateMinimumOrder(MINIMUM_ORDER_IN_CENTS)).not.toThrow();
   });
 
+  it("permite la excepción únicamente para el producto de prueba Yape", () => {
+    expect(() => validateMinimumOrder(1_000, true)).not.toThrow();
+    expect(() => validateMinimumOrder(1_000, false)).toThrow("El pedido mínimo es de S/ 99.00.");
+  });
+
   it("define el umbral de envío gratuito desde S/ 199", () => {
     expect(FREE_SHIPPING_THRESHOLD_IN_CENTS).toBe(19_900);
     expect(qualifiesForFreeShipping(FREE_SHIPPING_THRESHOLD_IN_CENTS - 1)).toBe(false);

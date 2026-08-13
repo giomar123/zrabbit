@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-export type CartItem = { productId: number; name: string; priceInCents: number; imageUrl: string | null; stock: number; quantity: number };
+export type CartItem = { productId: number; slug: string; name: string; priceInCents: number; imageUrl: string | null; stock: number; quantity: number };
 type CartContextValue = { items: CartItem[]; count: number; totalInCents: number; addItem: (item: Omit<CartItem, "quantity">) => void; updateQuantity: (productId: number, quantity: number) => void; removeItem: (productId: number) => void; clear: () => void };
 const CartContext = createContext<CartContextValue | null>(null);
 const storageKey = "figura-collectibles-cart";

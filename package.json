@@ -12,6 +12,7 @@
     "test": "vitest run",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
     "seed:railway": "node scripts/seed-railway.mjs",
+    "seed:yape-test": "node scripts/seed-yape-test.mjs",
     "repair:shipping": "node scripts/repair-shipping.mjs"
   },
   "dependencies": {
