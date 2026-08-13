@@ -6,6 +6,7 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
+import { registerGoogleAuthRoutes } from "./googleAuth";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { getCatalogProductBySlug } from "../catalog";
@@ -66,6 +67,7 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  registerGoogleAuthRoutes(app);
   await registerProductSharingRoutes(app);
   // tRPC API
   app.use(

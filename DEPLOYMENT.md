@@ -47,6 +47,9 @@ La carga inicial crea únicamente los elementos que todavía no existan: la cate
 | `CANONICAL_ORIGIN` | URL pública final, por ejemplo `https://tudominio.com`; se usa para `og:url`, canónica e imágenes de compartir. | Recomendable antes de campañas |
 | `MERCADOPAGO_ACCESS_TOKEN` | Procesa y confirma pagos desde el servidor. | Pendiente de crear la cuenta Mercado Pago |
 | `VITE_MERCADOPAGO_PUBLIC_KEY` | Tokeniza la tarjeta en el formulario de pago integrado. | Pendiente de crear la cuenta Mercado Pago |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Cliente OAuth web de Google para el panel administrador. | Obligatoria para acceder a `/admin` en Railway. |
+| `GOOGLE_ADMIN_EMAIL` | Dirección Gmail exacta autorizada para el panel. | Obligatoria para acceder a `/admin` en Railway. |
+| `GOOGLE_OAUTH_REDIRECT_URI` | Callback autorizado del cliente Google OAuth. | Debe ser exactamente `https://zrabbit.shop/api/auth/google/callback`. |
 
 > **Pagos:** el checkout, los pedidos y los estados de pago ya cuentan con una base preparada. No se deben añadir las claves de Mercado Pago al repositorio ni al código. Cuando exista la cuenta de vendedor, se registrarán como secretos del entorno y se habilitará el formulario de pago dentro de la tienda.
 

@@ -17,7 +17,10 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
   const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
 
   if (!isUnauthorized) return;
-
+  if (window.location.pathname.startsWith("/admin")) {
+    window.location.assign("/admin/login");
+    return;
+  }
   startLogin();
 };
 

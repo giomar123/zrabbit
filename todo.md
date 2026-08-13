@@ -64,3 +64,17 @@
 - [x] Diagnosticar y corregir las rutas de logo y hero que fallan en el despliegue Railway.
 - [x] Preparar una carga inicial idempotente de categoría, Pikachu Select y sus imágenes para MySQL Railway.
 - [ ] Verificar visualmente en Railway los recursos y el catálogo cargado.
+- [ ] Diagnosticar y configurar las variables de autenticación de producción para que el propietario acceda a `/admin`.
+- [ ] Verificar el inicio de sesión y el rol administrador en zrabbit.shop/admin.
+- [ ] Diseñar credenciales secretas de administrador y sesiones firmadas para Railway.
+- [ ] Implementar el inicio de sesión local, cierre de sesión y protección de rutas administrativas.
+- [ ] Crear la pantalla `/admin/login` y redirigir visitantes no autenticados.
+- [ ] Configurar las credenciales seguras en Railway y verificar el acceso administrador publicado.
+- [ ] Añadir y ejecutar pruebas de credenciales y sesión local administrativa.
+- [x] Definir si el administrador entra con correo Gmail y contraseña local o con el botón Iniciar sesión con Google.
+- [ ] Configurar Google OAuth para el panel, restringido al Gmail administrador.
+- [x] Implementar callback, sesión segura y cierre de sesión con Google OAuth.
+- [x] Retirar el acceso local con contraseña del flujo publicado tras validar Google OAuth.
+- [x] Añadir y ejecutar pruebas de configuración segura de Google OAuth.
+- [ ] Configurar en Railway GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_ADMIN_EMAIL y GOOGLE_OAUTH_REDIRECT_URI.
+- [ ] Validar en producción el callback de Google, la sesión administrativa, el cierre de sesión y el rechazo de otras cuentas.
