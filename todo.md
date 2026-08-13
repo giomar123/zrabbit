@@ -37,4 +37,7 @@
 - [x] Sincronizar la portada de estanterías y la paleta grafito, azul noche y ámbar en GitHub.
 - [x] Generar una imagen hero original de vitrina iluminada con figuras inspiradas en acción y monstruos de bolsillo.
 - [x] Sustituir la referencia literal por la nueva imagen hero y verificar la portada.
-- [ ] Sincronizar en GitHub la imagen hero generada y su integración en la portada.
+- [x] Sincronizar en GitHub la imagen hero generada y su integración en la portada.
+- [x] Alojar el logo zRabbit de forma persistente para usarlo en la tienda.
+- [x] Reemplazar la marca Figura Fiebre por zRabbit en cabecera, pie de página y metadatos.
+- [ ] Verificar la identidad zRabbit en escritorio y móvil y sincronizarla en GitHub.
