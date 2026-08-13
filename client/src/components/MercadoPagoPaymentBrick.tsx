@@ -8,6 +8,18 @@ declare global {
 
 type PaymentResult = { status: "awaiting_payment" | "paid" | "cancelled"; detail: string | null; orderNumber: string };
 
+function loadMercadoPagoSdk() {
+  if (window.MercadoPago) return Promise.resolve();
+  const existing = document.querySelector<HTMLScriptElement>('script[data-mercado-pago-sdk]');
+  const script = existing ?? document.createElement("script");
+  if (!existing) { script.src = "https://sdk.mercadopago.com/js/v2"; script.dataset.mercadoPagoSdk = "true"; document.head.appendChild(script); }
+  return new Promise<void>((resolve, reject) => {
+    const timeout = window.setTimeout(() => reject(new Error("El SDK de Mercado Pago no respondió.")), 10_000);
+    const ready = () => { window.clearTimeout(timeout); window.MercadoPago ? resolve() : reject(new Error("El SDK no está disponible.")); };
+    script.addEventListener("load", ready, { once: true }); script.addEventListener("error", () => { window.clearTimeout(timeout); reject(new Error("No se pudo descargar el SDK.")); }, { once: true });
+  });
+}
+
 export function MercadoPagoPaymentBrick({ order, onResult }: { order: { id: number; totalInCents: number; customerEmail: string }; onResult: (result: PaymentResult) => void }) {
   const brickRef = useRef<{ unmount: () => void } | null>(null);
   const [ready, setReady] = useState(false);
@@ -16,10 +28,12 @@ export function MercadoPagoPaymentBrick({ order, onResult }: { order: { id: numb
 
   useEffect(() => {
     const key = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY as string | undefined;
-    if (!key || !window.MercadoPago) { setError("El checkout de Mercado Pago no está disponible. Recarga la página en unos segundos."); return; }
+    if (!key) { setError("Falta la clave pública de Mercado Pago. Configura VITE_MERCADOPAGO_PUBLIC_KEY en Railway y vuelve a desplegar."); return; }
     let active = true;
+    loadMercadoPagoSdk().then(() => {
+    if (!active || !window.MercadoPago) return;
     const mp = new window.MercadoPago(key, { locale: "es-PE" });
-    mp.bricks().create("payment", "mercadoPagoPaymentBrick", {
+    return mp.bricks().create("payment", "mercadoPagoPaymentBrick", {
       initialization: { amount: order.totalInCents / 100, payer: { email: order.customerEmail } },
       customization: { paymentMethods: { creditCard: "all", debitCard: "all", mercadoPago: "all" } },
       callbacks: {
@@ -30,7 +44,8 @@ export function MercadoPagoPaymentBrick({ order, onResult }: { order: { id: numb
           pay.mutate({ orderId: order.id, token: String(formData.token ?? ""), paymentMethodId: String(formData.payment_method_id ?? ""), issuerId: formData.issuer_id ? String(formData.issuer_id) : undefined, installments: Number(formData.installments ?? 1), payerEmail: String(payer.email ?? order.customerEmail), identificationType: payer.identification_type ? String(payer.identification_type) : undefined, identificationNumber: payer.identification_number ? String(payer.identification_number) : undefined }, { onSuccess: result => { onResult(result); resolve(); }, onError: paymentError => { setError(paymentError.message); reject(paymentError); } });
         }),
       },
-    }).then(brick => { brickRef.current = brick; }).catch(() => setError("No fue posible iniciar Mercado Pago."));
+    }).then(brick => { if (brick) brickRef.current = brick; });
+    }).catch((sdkError: Error) => { if (active) setError(`No fue posible cargar Mercado Pago: ${sdkError.message}`); });
     return () => { active = false; brickRef.current?.unmount(); brickRef.current = null; };
   }, [order.id, order.totalInCents, order.customerEmail]);
 

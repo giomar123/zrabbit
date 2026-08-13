@@ -113,6 +113,8 @@
 - [x] Probar checkout.pay con API simulada, idempotencia y actualización de pedido verificable.
 - [x] Probar el endpoint de webhook con firma válida e inválida, incluidas sus respuestas HTTP.
 - [ ] Probar un pago end-to-end de Mercado Pago en entorno de prueba antes de habilitar producción.
+- [ ] Diagnosticar por qué el SDK o la clave pública de Mercado Pago no está disponible en Railway.
+- [ ] Corregir la carga del Payment Brick y validar su visualización en el checkout publicado.
 - [x] Recuperar la autenticación de GitHub o utilizar un método alternativo de publicación para desplegar Mercado Pago.
 - [x] Probar el procedimiento checkout.pay mediante tRPC con una respuesta simulada de Mercado Pago.
 - [x] Verificar una segunda ejecución del mismo pedido y token para confirmar la clave de idempotencia usada en cada intento.
