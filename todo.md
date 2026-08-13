@@ -78,3 +78,9 @@
 - [x] Añadir y ejecutar pruebas de configuración segura de Google OAuth.
 - [ ] Configurar en Railway GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_ADMIN_EMAIL y GOOGLE_OAUTH_REDIRECT_URI.
 - [ ] Validar en producción el callback de Google, la sesión administrativa, el cierre de sesión y el rechazo de otras cuentas.
+- [ ] Eliminar el mensaje "Google OAuth aún no está configurado" configurando las variables OAuth del servicio zRabbit en Railway.
+- [x] Crear el cliente OAuth web de Google Cloud con el callback exacto de zrabbit.shop.
+- [ ] Registrar Client ID, Client Secret, Gmail administrador, callback y JWT_SECRET en Railway.
+- [x] Validar las credenciales Google OAuth registradas mediante el estado seguro de configuración.
+- [ ] Configurar la pantalla de consentimiento de Google OAuth para zRabbit antes de crear la credencial web.
+- [x] Confirmar el modelo de autenticación final tras evaluar seguridad y mantenimiento de Google OAuth frente a acceso local.
