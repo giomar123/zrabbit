@@ -34,4 +34,7 @@
 - [x] Sustituir la imagen hero por la escena de estanterías de figuras aportada por el usuario.
 - [x] Ajustar la paleta a grafito, azul noche y ámbar, manteniendo legibilidad y contraste.
 - [x] Verificar la portada ambiental en escritorio y móvil y sincronizar el ajuste en GitHub.
-- [ ] Sincronizar la portada de estanterías y la paleta grafito, azul noche y ámbar en GitHub.
+- [x] Sincronizar la portada de estanterías y la paleta grafito, azul noche y ámbar en GitHub.
+- [x] Generar una imagen hero original de vitrina iluminada con figuras inspiradas en acción y monstruos de bolsillo.
+- [x] Sustituir la referencia literal por la nueva imagen hero y verificar la portada.
+- [ ] Sincronizar en GitHub la imagen hero generada y su integración en la portada.
