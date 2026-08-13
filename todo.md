@@ -1,0 +1,28 @@
+# Project TODO
+
+- [ ] Configurar Mercado Pago Checkout API y completar sus credenciales seguras para un checkout integrado.
+- [ ] Activar Mercado Pago con claves de prueba o producción cuando el usuario cree su cuenta de vendedor.
+- [x] Diseñar el esquema de categorías, productos, imágenes persistentes, pedidos y sus estados.
+- [x] Aplicar la migración de base de datos para el catálogo, inventario y ventas.
+- [x] Crear procedimientos seguros para el catálogo público y la administración autenticada.
+- [x] Construir la portada responsive con estética Memphis, secciones destacadas y ofertas.
+- [x] Crear el catálogo con filtros por categoría, precio y disponibilidad.
+- [x] Crear la página de producto con galería, información de stock, compra y metadatos de compartir.
+- [x] Implementar el carrito y el flujo de checkout integrado.
+- [ ] Crear la gestión segura de preferencias, estados y notificaciones de pago de Mercado Pago.
+- [x] Construir el panel privado para categorías, productos, imágenes, inventario y pedidos.
+- [x] Configurar la carga de imágenes en almacenamiento persistente y reutilizable en campañas de Meta.
+- [x] Añadir operaciones administrativas para crear, ordenar, editar y retirar las referencias de imágenes de producto.
+- [x] Conectar los filtros visibles del catálogo a categoría, rango de precios y disponibilidad reales.
+- [x] Añadir metadatos por producto verificables para compartir en Meta, URL canónica y datos estructurados.
+- [ ] Sustituir la reserva de pedido por el checkout real embebido de Mercado Pago y su resultado de pago.
+- [x] Completar en el panel la edición de texto alternativo y el orden de las imágenes de cada producto.
+- [ ] Añadir fundamentos para analítica y campañas por producto: URLs canónicas, Open Graph, datos estructurados y eventos de conversión preparados.
+- [ ] Añadir configuración, guías y archivos necesarios para trabajar con GitHub y Railway.
+- [ ] Reemplazar el contenido anterior de la rama principal de GitHub con la versión vigente de la tienda.
+- [x] Escribir y ejecutar pruebas unitarias para las reglas de catálogo, stock, pedidos y control de acceso.
+- [x] Verificar con pruebas que las rutas administrativas rechazan a visitantes y a usuarios sin rol de administrador.
+- [x] Verificar la interfaz en escritorio y móvil, revisar accesibilidad y guardar un punto de restauración.
+- [x] Añadir pruebas unitarias para catálogo público, validaciones de stock insuficiente y creación de pedidos.
+- [x] Añadir pruebas adicionales para la administración de imágenes.
+- [x] Documentar la revisión básica de accesibilidad y guardar el punto de restauración final.

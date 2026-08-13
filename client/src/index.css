@@ -1,177 +1,25 @@
-@import "tailwindcss";
 @import "tw-animate-css";
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px); --radius-md: calc(var(--radius) - 2px); --radius-lg: var(--radius); --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background); --color-foreground: var(--foreground); --color-card: var(--card); --color-card-foreground: var(--card-foreground); --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground); --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground); --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground); --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground); --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground); --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground); --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring); --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground); --color-sidebar-primary: var(--sidebar-primary); --color-sidebar-primary-foreground: var(--sidebar-primary-foreground); --color-sidebar-accent: var(--sidebar-accent); --color-sidebar-accent-foreground: var(--sidebar-accent-foreground); --color-sidebar-border: var(--sidebar-border); --color-sidebar-ring: var(--sidebar-ring); --color-ink: #161616; --color-peach: #ffe0cc; --color-mint: #b7e4c7; --color-lilac: #d6c2ff; --color-sun: #ffe45c;
 }
-
-:root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --radius: 0.65rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.235 0.015 65);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.015 65);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.015 65);
-  --secondary: oklch(0.98 0.001 286.375);
-  --secondary-foreground: oklch(0.4 0.015 65);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.141 0.005 285.823);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.623 0.214 259.815);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.235 0.015 65);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.623 0.214 259.815);
-}
-
-.dark {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.85 0.005 65);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.85 0.005 65);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.85 0.005 65);
-  --secondary: oklch(0.24 0.006 286.033);
-  --secondary-foreground: oklch(0.7 0.005 65);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.488 0.243 264.376);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.85 0.005 65);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.488 0.243 264.376);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  button:not(:disabled),
-  [role="button"]:not([aria-disabled="true"]),
-  [type="button"]:not(:disabled),
-  [type="submit"]:not(:disabled),
-  [type="reset"]:not(:disabled),
-  a[href],
-  select:not(:disabled),
-  input[type="checkbox"]:not(:disabled),
-  input[type="radio"]:not(:disabled) {
-    @apply cursor-pointer;
-  }
-}
-
-@layer components {
-  /**
-   * Custom container utility that centers content and adds responsive padding.
-   *
-   * This overrides Tailwind's default container behavior to:
-   * - Auto-center content (mx-auto)
-   * - Add responsive horizontal padding
-   * - Set max-width for large screens
-   *
-   * Usage: <div className="container">...</div>
-   *
-   * For custom widths, use max-w-* utilities directly:
-   * <div className="max-w-6xl mx-auto px-4">...</div>
-   */
-  .container {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1rem; /* 16px - mobile padding */
-    padding-right: 1rem;
-  }
-
-  .flex {
-    min-height: 0;
-    min-width: 0;
-  }
-
-  @media (min-width: 640px) {
-    .container {
-      padding-left: 1.5rem; /* 24px - tablet padding */
-      padding-right: 1.5rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .container {
-      padding-left: 2rem; /* 32px - desktop padding */
-      padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
-    }
-  }
-}
+:root { --radius: 1rem; --background: #ffe0cc; --foreground: #161616; --card: #fff; --card-foreground: #161616; --popover: #fff; --popover-foreground: #161616; --primary: #161616; --primary-foreground: #fff; --secondary: #b7e4c7; --secondary-foreground: #161616; --muted: #f5efe9; --muted-foreground: #625d58; --accent: #d6c2ff; --accent-foreground: #161616; --destructive: #be123c; --destructive-foreground: #fff; --border: #161616; --input: #161616; --ring: #161616; --sidebar: #fff; --sidebar-foreground: #161616; --sidebar-primary: #161616; --sidebar-primary-foreground: #fff; --sidebar-accent: #ffe45c; --sidebar-accent-foreground: #161616; --sidebar-border: #161616; --sidebar-ring: #161616; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: "Nunito Sans", Arial, sans-serif; }
+button, input { font: inherit; }
+a { color: inherit; text-decoration: none; }
+button:not(:disabled), a[href] { cursor: pointer; }
+.container { width: 100%; margin-inline: auto; padding-inline: 1rem; } @media (min-width: 640px) { .container { padding-inline: 1.5rem; } } @media (min-width: 1024px) { .container { max-width: 1280px; padding-inline: 2rem; } }
+.memphis-card { border: 2px solid #161616; border-radius: 1rem; box-shadow: 5px 5px 0 #161616; }
+.memphis-button { display: inline-flex; min-height: 2.9rem; align-items: center; gap: .5rem; border: 2px solid #161616; border-radius: 999px; padding: .7rem 1.1rem; font-size: .78rem; font-weight: 900; line-height: 1; text-transform: uppercase; letter-spacing: .07em; box-shadow: 3px 3px 0 #161616; transition: transform .16s cubic-bezier(.23,1,.32,1), box-shadow .16s cubic-bezier(.23,1,.32,1); } .memphis-button:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 #161616; } .memphis-button:active { transform: translate(2px,2px) scale(.97); box-shadow: 1px 1px 0 #161616; }
+.eyebrow { display: inline-flex; align-items: center; gap: .4rem; border: 2px solid #161616; border-radius: 999px; background: #fff; padding: .38rem .7rem; font-size: .65rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.section-title { font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 900; line-height: .86; letter-spacing: -.075em; text-transform: uppercase; }
+.text-stroke { color: #fff; text-shadow: -2px -2px 0 #161616, 2px -2px 0 #161616, -2px 2px 0 #161616, 2px 2px 0 #161616; }
+.hero-grid { background-color: #ffe0cc; background-image: radial-gradient(#161616 1.1px, transparent 1.1px); background-size: 20px 20px; }
+.shape { position: absolute; display: block; border: 2px solid #161616; } .shape-circle { top: 8%; left: 3%; width: 54px; height: 54px; border-radius: 999px; } .shape-square { right: 5%; bottom: 12%; width: 42px; height: 42px; transform: rotate(17deg); } .shape-triangle { right: 43%; top: 11%; width: 0; height: 0; border-top: 22px solid transparent; border-bottom: 22px solid transparent; border-left: 38px solid #ffe45c; filter: drop-shadow(2px 2px 0 #161616); }
+.filter-chip { border: 2px solid #161616; border-radius: 999px; background: #fff; padding: .5rem .8rem; font-size: .72rem; font-weight: 900; text-transform: uppercase; transition: transform .15s; } .filter-chip:hover { transform: rotate(-2deg) translateY(-2px); }
+.form-label { display: grid; gap: .35rem; font-size: .7rem; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; }.form-input { width: 100%; border: 2px solid #161616; border-radius: .7rem; background: #fff; padding: .65rem .75rem; font-size: .88rem; font-weight: 600; text-transform: none; letter-spacing: normal; outline: none; }.form-input:focus { box-shadow: 3px 3px 0 #161616; }
+@media (prefers-reduced-motion: no-preference) { .memphis-card, .shape { transition: transform .24s cubic-bezier(.23,1,.32,1); } }
