@@ -1,7 +1,7 @@
 import type express from "express";
 import { createHash, createHmac, timingSafeEqual } from "crypto";
 import { eq } from "drizzle-orm";
-import { orders } from "../drizzle/schema";
+import { orders, paymentEvents } from "../drizzle/schema";
 import { getDb } from "./db";
 
 type StoreOrderStatus = "awaiting_payment" | "paid" | "cancelled";
@@ -71,21 +71,27 @@ export async function createMercadoPagoPayment(input: { orderId: number; token: 
 export async function syncMercadoPagoPayment(paymentId: string) {
   const db = await getDb(); if (!db) throw new Error("La base de datos no está disponible.");
   const payment = await mercadoFetch(`/v1/payments/${encodeURIComponent(paymentId)}`);
-  if (!payment.external_reference) return { synchronized: false };
+  if (!payment.external_reference) return { synchronized: false, reason: "missing_external_reference", providerStatus: payment.status ?? null };
   const order = (await db.select().from(orders).where(eq(orders.orderNumber, payment.external_reference)).limit(1))[0];
-  if (!order || Math.round((payment.transaction_amount ?? 0) * 100) !== order.totalInCents) return { synchronized: false };
+  if (!order || Math.round((payment.transaction_amount ?? 0) * 100) !== order.totalInCents) return { synchronized: false, reason: "order_not_found_or_amount_mismatch", providerStatus: payment.status ?? null };
   const status = toStoreStatus(payment.status);
   await db.update(orders).set({ status, mercadoPagoPaymentId: payment.id ? String(payment.id) : paymentId, mercadoPagoStatus: payment.status ?? null }).where(eq(orders.id, order.id));
-  return { synchronized: true, status };
+  return { synchronized: true, status, orderId: order.id, providerStatus: payment.status ?? null };
 }
 
 export function registerMercadoPagoWebhook(app: express.Express) {
   app.post("/api/mercado-pago/webhook", async (req, res) => {
     const paymentId = String(req.body?.data?.id ?? req.query["data.id"] ?? "");
-    const valid = verifyMercadoPagoWebhookSignature({ signature: req.get("x-signature") ?? undefined, requestId: req.get("x-request-id") ?? undefined, dataId: paymentId || undefined });
-    if (!valid) return res.status(401).json({ received: false });
-    if (!paymentId) return res.status(200).json({ received: true });
-    try { await syncMercadoPagoPayment(paymentId); return res.status(200).json({ received: true }); }
-    catch (error) { console.error("[Mercado Pago webhook]", error); return res.status(500).json({ received: false }); }
+    const requestId = req.get("x-request-id") ?? undefined;
+    const valid = verifyMercadoPagoWebhookSignature({ signature: req.get("x-signature") ?? undefined, requestId, dataId: paymentId || undefined });
+    const db = await getDb();
+    const record = async (values: { orderId?: number; signatureValid: boolean; providerStatus?: string | null; result: string; reason?: string; }) => {
+      if (!db) return;
+      await db.insert(paymentEvents).values({ orderId: values.orderId ?? null, providerPaymentId: paymentId || null, eventType: String(req.body?.type ?? req.query.type ?? "payment").slice(0, 80), signatureValid: values.signatureValid, providerStatus: values.providerStatus ?? null, result: values.result, reason: values.reason?.slice(0, 240) ?? null, requestId: requestId?.slice(0, 180) ?? null });
+    };
+    if (!valid) { await record({ signatureValid: false, result: "rejected", reason: "invalid_signature" }); return res.status(401).json({ received: false }); }
+    if (!paymentId) { await record({ signatureValid: true, result: "ignored", reason: "missing_payment_id" }); return res.status(200).json({ received: true }); }
+    try { const sync = await syncMercadoPagoPayment(paymentId); await record({ orderId: sync.orderId, signatureValid: true, providerStatus: sync.providerStatus, result: sync.synchronized ? "synchronized" : "ignored", reason: sync.reason }); return res.status(200).json({ received: true }); }
+    catch (error) { console.error("[Mercado Pago webhook]", error); await record({ signatureValid: true, result: "error", reason: "sync_failed" }); return res.status(500).json({ received: false }); }
   });
 }

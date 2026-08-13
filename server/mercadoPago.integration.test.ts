@@ -2,7 +2,7 @@ import { createHmac } from "crypto";
 import express from "express";
 import { eq } from "drizzle-orm";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { orderItems, orders, products } from "../drizzle/schema";
+import { orderItems, orders, paymentEvents, products } from "../drizzle/schema";
 import { createPendingOrder } from "./catalog";
 import { getDb } from "./db";
 import { createMercadoPagoPayment, registerMercadoPagoWebhook } from "./mercadoPago";
@@ -22,6 +22,7 @@ async function createTestOrder() {
 }
 
 async function removeTestOrder(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, id: number) {
+  await db.delete(paymentEvents).where(eq(paymentEvents.orderId, id));
   await db.delete(orderItems).where(eq(orderItems.orderId, id));
   await db.delete(orders).where(eq(orders.id, id));
 }
@@ -79,6 +80,8 @@ describe("flujo integrado Mercado Pago", () => {
       expect((await realFetch(`${base}/api/mercado-pago/webhook`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: { id: dataId } }) })).status).toBe(401);
       expect((await realFetch(`${base}/api/mercado-pago/webhook`, { method: "POST", headers: { "Content-Type": "application/json", "x-request-id": requestId, "x-signature": `ts=${ts},v1=${signature}` }, body: JSON.stringify({ data: { id: dataId } }) })).status).toBe(200);
       const stored = (await db.select().from(orders).where(eq(orders.id, order.id)).limit(1))[0]; expect(stored?.status).toBe("paid");
+      const events = await db.select().from(paymentEvents).where(eq(paymentEvents.orderId, order.id));
+      expect(events).toHaveLength(1); expect(events[0]).toMatchObject({ providerPaymentId: dataId, signatureValid: true, result: "synchronized", providerStatus: "approved" });
     } finally { await new Promise<void>(resolve => server.close(() => resolve())); await removeTestOrder(db, order.id); }
   });
 });

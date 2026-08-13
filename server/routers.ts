@@ -1,7 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { authorizedGoogleEmails, categories, orderItems, orders, productImages, products, users } from "../drizzle/schema";
+import { authorizedGoogleEmails, categories, orderItems, orders, paymentEvents, productImages, products, users } from "../drizzle/schema";
 import { createPendingOrder, getCatalogProductBySlug, listActiveCategories, listCatalogProducts } from "./catalog";
 import { getDb } from "./db";
 import { storagePut } from "./storage";
@@ -163,6 +163,7 @@ export const appRouter = router({
         const [orderRows, itemRows] = await Promise.all([db.select().from(orders).orderBy(desc(orders.createdAt)), db.select().from(orderItems)]);
         return orderRows.map(order => ({ ...order, items: itemRows.filter(item => item.orderId === order.id) }));
       }),
+      paymentEvents: adminProcedure.input(z.object({ orderId: z.number().int().positive() })).query(async ({ input }) => { const db = await requireDb(); return db.select().from(paymentEvents).where(eq(paymentEvents.orderId, input.orderId)).orderBy(desc(paymentEvents.createdAt)); }),
       updateStatus: adminProcedure.input(z.object({ id: z.number().int().positive(), status: z.enum(["pending", "awaiting_payment", "paid", "cancelled", "fulfilled"]) })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(orders).set({ status: input.status }).where(eq(orders.id, input.id)); return { success: true }; }),
     }),
   }),

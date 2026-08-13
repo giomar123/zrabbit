@@ -102,6 +102,19 @@ export const orderItems = mysqlTable("orderItems", {
   subtotalInCents: int("subtotalInCents").notNull(),
 }, table => [index("order_items_order_idx").on(table.orderId)]);
 
+export const paymentEvents = mysqlTable("paymentEvents", {
+  id: int("id").autoincrement().primaryKey(),
+  orderId: int("orderId"),
+  providerPaymentId: varchar("providerPaymentId", { length: 180 }),
+  eventType: varchar("eventType", { length: 80 }).default("payment").notNull(),
+  signatureValid: boolean("signatureValid").notNull(),
+  providerStatus: varchar("providerStatus", { length: 80 }),
+  result: varchar("result", { length: 40 }).notNull(),
+  reason: varchar("reason", { length: 240 }),
+  requestId: varchar("requestId", { length: 180 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => [index("payment_events_order_idx").on(table.orderId), index("payment_events_payment_idx").on(table.providerPaymentId)]);
+
 export type User = typeof users.$inferSelect;
 export type AuthorizedGoogleEmail = typeof authorizedGoogleEmails.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -109,3 +122,4 @@ export type Category = typeof categories.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type ProductImage = typeof productImages.$inferSelect;
 export type Order = typeof orders.$inferSelect;
+export type PaymentEvent = typeof paymentEvents.$inferSelect;

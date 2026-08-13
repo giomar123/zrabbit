@@ -126,6 +126,9 @@
 - [ ] Confirmar que VITE_MERCADOPAGO_PUBLIC_KEY y MERCADOPAGO_ACCESS_TOKEN provienen de la misma aplicación de prueba.
 - [ ] Añadir diagnóstico seguro para distinguir errores de autorización, token de tarjeta y configuración de Mercado Pago.
 - [ ] Inspeccionar en Railway el resultado de un intento 401 sin revelar tarjetas, claves ni datos personales.
+- [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.
+- [x] Mostrar en el panel administrativo el historial de notificaciones de pago por pedido.
+- [ ] Configurar en Mercado Pago y Railway la firma de webhooks para el entorno de prueba.
 - [x] Probar que un 401 de Mercado Pago entrega diagnóstico seguro de código y causa al checkout.
 - [x] Recuperar la autenticación de GitHub o utilizar un método alternativo de publicación para desplegar Mercado Pago.
 - [x] Probar el procedimiento checkout.pay mediante tRPC con una respuesta simulada de Mercado Pago.
