@@ -6,6 +6,38 @@ El proyecto es una aplicación Node.js con React, Express, tRPC y MySQL/TiDB. El
 
 El código se sincronizará con el repositorio seleccionado `giomar123/zrabbit`. En Railway, se debe crear un proyecto nuevo, elegir **Deploy from GitHub Repo**, seleccionar dicho repositorio y autorizar la rama `main`. Railway desplegará automáticamente los commits posteriores de esa rama.
 
+## Base de datos en Railway
+
+> **Importante:** la base de datos de desarrollo de este proyecto ya contiene las tablas `users`, `categories`, `products`, `productImages`, `orders` y `orderItems`. Una implementación en Railway es un entorno independiente: no reutiliza ni copia automáticamente esa base. Por ello, el servicio publicado necesita su propia base MySQL y una migración inicial.
+
+En el mismo proyecto de Railway, crea un servicio **MySQL** desde el botón **+ New**. Railway publica en ese servicio, entre otras, la variable `MYSQL_URL`. En el servicio de la aplicación zRabbit abre **Variables** y registra la referencia siguiente, sustituyendo `MySQL` por el nombre exacto de tu servicio de base de datos:
+
+```dotenv
+DATABASE_URL=${{MySQL.MYSQL_URL}}
+```
+
+Railway resuelve las referencias entre servicios con la sintaxis `${{SERVICE_NAME.VARIABLE}}`. Después de guardar la variable, revisa y despliega el cambio. Finalmente, desde la consola del servicio web de Railway ejecuta una vez:
+
+```bash
+pnpm drizzle-kit migrate
+```
+
+Este comando crea las tablas definidas en `drizzle/schema.ts` dentro de tu MySQL de Railway. No uses `drizzle-kit generate` en producción: las migraciones ya están versionadas en el repositorio. Si la consola no encuentra el comando, ejecuta `pnpm exec drizzle-kit migrate`.
+
+Tras completar la migración, puedes cargar el catálogo inicial de prueba con sus imágenes públicas ejecutando una sola vez:
+
+```bash
+pnpm seed:railway
+```
+
+La carga inicial crea únicamente los elementos que todavía no existan: la categoría Pokémon, el producto **Pikachu Select — Serie 11** a S/ 95 y sus tres imágenes. Es segura de ejecutar más de una vez y no reemplaza productos ni imágenes ya creados desde el panel. El logotipo y la vitrina hero usan URLs CDN públicas para mostrarse tanto en el entorno de Manus como en Railway.
+
+| Comprobación posterior | Resultado esperado |
+|---|---|
+| Cargar la tienda | El catálogo consulta la base de Railway sin errores. |
+| Abrir `/admin` con el rol administrador | Productos, usuarios y pedidos muestran la información del nuevo entorno. |
+| Ejecutar el comando de migración otra vez | No se recrean ni eliminan datos; se aplican únicamente migraciones pendientes. |
+
 | Variable | Uso | Estado para el primer despliegue |
 |---|---|---|
 | `DATABASE_URL` | Base de datos MySQL/TiDB de productos, pedidos y usuarios. | Obligatoria |
@@ -27,3 +59,7 @@ Antes de conectar un dominio y lanzar campañas, ejecuta `pnpm check` y `pnpm te
 [1] [Railway Docs — Config as Code](https://docs.railway.com/config-as-code/reference)
 
 [2] [Railway Docs — Build Configuration](https://docs.railway.com/builds/build-configuration)
+
+[3] [Railway Docs — MySQL](https://docs.railway.com/databases/mysql)
+
+[4] [Railway Docs — Using Variables](https://docs.railway.com/variables)

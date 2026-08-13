@@ -51,3 +51,16 @@
 - [x] Verificar en sesión de administrador las pestañas Productos, Usuarios, Pedidos y Mi cuenta, incluida su adaptación móvil.
 - [x] Documentar por separado la evidencia de panel autenticado y de acceso restringido para visitantes.
 - [x] Añadir pruebas de seguridad para los cambios de rol y retiro de usuarios del panel.
+- [ ] Verificar la conexión de base de datos de producción requerida por Railway.
+- [x] Documentar la variable DATABASE_URL y el proceso de migración de tablas en Railway.
+- [ ] Validar que catálogo, pedidos y usuarios se mantengan disponibles tras conectar la base de datos de producción.
+- [ ] Confirmar si Railway usará MySQL compatible con el esquema actual o si se migrará intencionalmente a PostgreSQL.
+- [ ] Configurar DATABASE_URL en el servicio zRabbit como referencia al servicio MySQL online de Railway.
+- [ ] Ejecutar la migración inicial en MySQL Railway y comprobar las tablas creadas.
+- [ ] Corregir la referencia DATABASE_URL ausente en el servicio web de Railway y volver a validar la consola.
+- [ ] Identificar el nombre exacto del servicio MySQL para usarlo en la referencia DATABASE_URL de Railway.
+- [ ] Confirmar en una consola nueva de Railway que DATABASE_URL existe sin exponer su valor.
+- [ ] Confirmar el resultado exitoso de la migración y las tablas creadas en MySQL Railway.
+- [x] Diagnosticar y corregir las rutas de logo y hero que fallan en el despliegue Railway.
+- [x] Preparar una carga inicial idempotente de categoría, Pikachu Select y sus imágenes para MySQL Railway.
+- [ ] Verificar visualmente en Railway los recursos y el catálogo cargado.
