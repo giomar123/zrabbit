@@ -76,6 +76,8 @@ export const orders = mysqlTable("orders", {
   customerPhone: varchar("customerPhone", { length: 40 }),
   shippingAddress: text("shippingAddress"),
   shippingDistrict: varchar("shippingDistrict", { length: 120 }),
+  shippingMethod: varchar("shippingMethod", { length: 40 }).default("shalom").notNull(),
+  isFreeShipping: boolean("isFreeShipping").default(false).notNull(),
   totalInCents: int("totalInCents").notNull(),
   currency: varchar("currency", { length: 3 }).default("PEN").notNull(),
   status: mysqlEnum("status", ["pending", "awaiting_payment", "paid", "cancelled", "fulfilled"]).default("pending").notNull(),

@@ -10,7 +10,8 @@ import Cart from "./pages/Cart";
 import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
 import Storefront from "./pages/Storefront";
+import TermsAndShipping from "./pages/TermsAndShipping";
 
-function Router() { return <Switch><Route path="/" component={Home} /><Route path="/catalogo">{() => <Storefront catalogueMode />}</Route><Route path="/productos/:slug">{params => <ProductDetail slug={params.slug} />}</Route><Route path="/carrito" component={Cart} /><Route path="/admin/login" component={AdminLogin} /><Route path="/admin" component={Admin} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch>; }
+function Router() { return <Switch><Route path="/" component={Home} /><Route path="/catalogo">{() => <Storefront catalogueMode />}</Route><Route path="/productos/:slug">{params => <ProductDetail slug={params.slug} />}</Route><Route path="/carrito" component={Cart} /><Route path="/terminos-y-envios" component={TermsAndShipping} /><Route path="/admin/login" component={AdminLogin} /><Route path="/admin" component={Admin} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch>; }
 function App() { return <ErrorBoundary><ThemeProvider defaultTheme="light"><CartProvider><Toaster /><Router /></CartProvider></ThemeProvider></ErrorBoundary>; }
 export default App;

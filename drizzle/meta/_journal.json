@@ -43,6 +43,13 @@
       "when": 1786636730364,
       "tag": "0005_graceful_skullbuster",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1786642349462,
+      "tag": "0006_hard_xavin",
+      "breakpoints": true
     }
   ]
 }

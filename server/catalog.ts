@@ -4,6 +4,17 @@ import { getDb } from "./db";
 
 export type CatalogFilters = { categorySlug?: string; minPrice?: number; maxPrice?: number; availableOnly?: boolean; featuredOnly?: boolean; offerOnly?: boolean };
 
+export const MINIMUM_ORDER_IN_CENTS = 9_900;
+export const FREE_SHIPPING_THRESHOLD_IN_CENTS = 19_900;
+
+export function validateMinimumOrder(totalInCents: number) {
+  if (totalInCents < MINIMUM_ORDER_IN_CENTS) throw new Error("El pedido mínimo es de S/ 99.00.");
+}
+
+export function qualifiesForFreeShipping(totalInCents: number) {
+  return totalInCents >= FREE_SHIPPING_THRESHOLD_IN_CENTS;
+}
+
 export function validateOrderQuantity(product: { name: string; stock: number; status: string }, quantity: number) {
   if (product.status !== "active") throw new Error(`${product.name} no está disponible.`);
   if (!Number.isInteger(quantity) || quantity < 1) throw new Error("La cantidad solicitada no es válida.");
@@ -51,8 +62,9 @@ export async function createPendingOrder(input: { customerName: string; customer
     return { product, quantity: item.quantity, subtotal: product.priceInCents * item.quantity };
   });
   const totalInCents = enriched.reduce((sum, item) => sum + item.subtotal, 0);
+  validateMinimumOrder(totalInCents);
   const orderNumber = `FC-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-  const result = await db.insert(orders).values({ orderNumber, customerName: input.customerName, customerEmail: input.customerEmail, customerPhone: input.customerPhone, shippingAddress: input.shippingAddress, shippingDistrict: input.shippingDistrict, totalInCents, status: "awaiting_payment" });
+  const result = await db.insert(orders).values({ orderNumber, customerName: input.customerName, customerEmail: input.customerEmail, customerPhone: input.customerPhone, shippingAddress: input.shippingAddress, shippingDistrict: input.shippingDistrict, shippingMethod: "shalom", isFreeShipping: qualifiesForFreeShipping(totalInCents), totalInCents, status: "awaiting_payment" });
   const orderId = Number(result[0].insertId);
   await db.insert(orderItems).values(enriched.map(({ product, quantity, subtotal }) => ({ orderId, productId: product.id, productName: product.name, imageUrl: product.mainImageUrl, unitPriceInCents: product.priceInCents, quantity, subtotalInCents: subtotal })));
   return { id: orderId, orderNumber, totalInCents, items: enriched };

@@ -139,6 +139,17 @@
 - [x] Contrastar la traza coincidente de claves con el flujo oficial de cuentas de prueba de Mercado Pago para Payment Brick.
 - [x] Preparar un caso de soporte de Mercado Pago con evidencia técnica saneada del 401 persistente.
 - [ ] Definir por separado una activación de producción con confirmación explícita antes de habilitar cobros reales.
+- [ ] Preparar la sustitución controlada de las dos credenciales de prueba por las credenciales de producción de la misma aplicación.
+- [ ] Confirmar el estado de producción de la cuenta y el webhook antes de permitir pagos reales.
+- [ ] Verificar que la URL de webhook esté guardada en modo producción y que su firma se sustituya de forma segura en Railway.
+- [x] Confirmar en Administración que el pedido productivo aprobado quedó registrado con estado pagado.
+- [ ] Confirmar en el historial del pedido que llegó un evento webhook de producción con firma válida.
+- [ ] Verificar la elegibilidad y activación de Yape para la cuenta de Mercado Pago y Payment Brick de zRabbit.
+- [ ] Habilitar y validar Yape sin alterar la disponibilidad de tarjeta ni los estados de pedido existentes.
+- [x] Aplicar pedido mínimo de S/ 99 y envío gratuito desde S/ 199 en la validación del checkout.
+- [x] Mostrar en el carrito el importe restante para alcanzar el pedido mínimo o el envío gratuito.
+- [x] Publicar términos, condiciones de compra y política de envíos mediante Shalom.
+- [ ] Aplicar la migración 0006 de método Shalom y envío gratuito en Railway antes del siguiente despliegue.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.
 - [x] Mostrar en el panel administrativo el historial de notificaciones de pago por pedido.
 - [ ] Configurar en Mercado Pago y Railway la firma de webhooks para el entorno de prueba.
