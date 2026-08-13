@@ -17,9 +17,9 @@
 - [x] Añadir metadatos por producto verificables para compartir en Meta, URL canónica y datos estructurados.
 - [ ] Sustituir la reserva de pedido por el checkout real embebido de Mercado Pago y su resultado de pago.
 - [x] Completar en el panel la edición de texto alternativo y el orden de las imágenes de cada producto.
-- [ ] Añadir fundamentos para analítica y campañas por producto: URLs canónicas, Open Graph, datos estructurados y eventos de conversión preparados.
-- [ ] Añadir configuración, guías y archivos necesarios para trabajar con GitHub y Railway.
-- [ ] Reemplazar el contenido anterior de la rama principal de GitHub con la versión vigente de la tienda.
+- [x] Añadir fundamentos para analítica y campañas por producto: URLs canónicas, Open Graph, datos estructurados y eventos de conversión preparados.
+- [x] Añadir configuración, guías y archivos necesarios para trabajar con GitHub y Railway.
+- [x] Reemplazar el contenido anterior de la rama principal de GitHub con la versión vigente de la tienda.
 - [x] Escribir y ejecutar pruebas unitarias para las reglas de catálogo, stock, pedidos y control de acceso.
 - [x] Verificar con pruebas que las rutas administrativas rechazan a visitantes y a usuarios sin rol de administrador.
 - [x] Verificar la interfaz en escritorio y móvil, revisar accesibilidad y guardar un punto de restauración.
