@@ -162,6 +162,8 @@
 - [ ] Confirmar que el checkout publicado crea un pedido normal después de ejecutar la reparación.
 - [ ] Crear un producto de prueba Yape de S/ 10 como excepción controlada del pedido mínimo.
 - [ ] Integrar el flujo oficial de Yape con teléfono y OTP sin modificar el flujo de tarjeta.
+- [ ] Aclarar en el formulario Yape que el OTP real se obtiene en la app del comprador y que la simulación usa valores fijos.
+- [ ] Confirmar si la validación Yape se hará con credenciales de prueba o como cobro real antes de enviar un pago.
 - [ ] Crear un producto de prueba de Yape a S/ 10 con una excepción controlada al pedido mínimo.
 - [ ] Mantener el pedido mínimo de S/ 99 para cualquier carrito que contenga productos reales.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.
