@@ -1,6 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { Loader2, PackageCheck, RefreshCw } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, PackageCheck, RefreshCw } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -8,6 +8,7 @@ export default function AdminCatalogActions() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const [selectedDraftId, setSelectedDraftId] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
   const utils = trpc.useUtils();
   const products = trpc.admin.products.list.useQuery(undefined, { enabled: isAdmin });
   const history = trpc.admin.inventorySync.history.useQuery(undefined, { enabled: isAdmin });
@@ -31,10 +32,39 @@ export default function AdminCatalogActions() {
   if (!isAdmin) return null;
 
   const latest = history.data?.[0];
+  if (!isExpanded) {
+    return (
+      <button
+        type="button"
+        onClick={() => setIsExpanded(true)}
+        aria-expanded={false}
+        aria-controls="catalog-control-panel"
+        className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-full border border-[#e8cfaa] bg-[#fffaf2] px-4 py-3 text-sm font-bold text-[#172033] shadow-lg shadow-slate-900/15 transition-transform duration-150 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6862b] focus-visible:ring-offset-2"
+      >
+        <RefreshCw size={16} className={sync.isPending ? "animate-spin" : ""} />
+        Catálogo
+        <ChevronUp size={16} aria-hidden="true" />
+      </button>
+    );
+  }
   return (
-    <aside className="fixed bottom-5 right-5 z-40 w-[min(22rem,calc(100vw-2.5rem))] rounded-2xl border border-[#e8cfaa] bg-[#fffaf2] p-4 shadow-xl shadow-slate-900/15">
-      <p className="text-xs font-black uppercase tracking-[0.16em] text-[#8a5110]">Control de catálogo</p>
-      <p className="mt-1 text-sm font-bold text-[#172033]">Inventario de contabilidad</p>
+    <aside id="catalog-control-panel" className="fixed bottom-5 right-5 z-40 w-[min(22rem,calc(100vw-2.5rem))] rounded-2xl border border-[#e8cfaa] bg-[#fffaf2] p-4 shadow-xl shadow-slate-900/15">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-[#8a5110]">Control de catálogo</p>
+          <p className="mt-1 text-sm font-bold text-[#172033]">Inventario de contabilidad</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsExpanded(false)}
+          aria-label="Minimizar control de catálogo"
+          aria-expanded={true}
+          aria-controls="catalog-control-panel"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#e8cfaa] bg-white text-[#8a5110] transition-colors hover:bg-[#fff1da] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c6862b]"
+        >
+          <ChevronDown size={18} aria-hidden="true" />
+        </button>
+      </div>
       <p className="mt-1 text-xs leading-5 text-slate-600">La sincronización trae código, stock final y precio sugerido. Los productos nuevos se guardan como borrador y sin fotografías.</p>
       <button type="button" disabled={sync.isPending} onClick={() => sync.mutate()} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#101824] px-3 py-2.5 text-sm font-bold text-white disabled:opacity-60">
         {sync.isPending ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}

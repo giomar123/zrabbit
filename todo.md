@@ -190,8 +190,12 @@
 - [x] Importar todo producto externo como borrador, sin imágenes, y permitir publicarlo tras cargar fotografías.
 - [ ] Configurar en Railway un servicio cron de corta duración para ejecutar la sincronización cada 15 días.
 - [ ] Corregir el despliegue cron que inició `pnpm start` en lugar de `pnpm sync:contabilidad`.
+- [x] Añadir un control minimizable para el panel de sincronización y publicación del catálogo.
 - [ ] Permitir que railway.json seleccione el proceso de inicio mediante una variable sin cambiar el servicio web principal.
 - [ ] Configurar `ZRABBIT_PROCESS=sync:contabilidad` únicamente en la copia cron de Railway.
+- [ ] Ejecutar el reparador de esquema de sincronización en Railway para crear inventorySyncRuns e inventorySyncSettings.
+- [ ] Ejecutar el reparador desde la consola del servicio web principal porque la copia cron no mantiene instancia activa.
+- [x] Ejecutar el reparador desde la consola del servicio web principal porque la copia cron no mantiene instancia activa.
 - [ ] Enviar una prueba de Resend posterior al despliegue Railway desde notificaciones@stevtel.com.
 - [ ] Crear un producto de prueba de Yape a S/ 10 con una excepción controlada al pedido mínimo.
 - [ ] Mantener el pedido mínimo de S/ 99 para cualquier carrito que contenga productos reales.
