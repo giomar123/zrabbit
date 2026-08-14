@@ -1,7 +1,7 @@
 # Project TODO
 
-- [ ] Configurar Mercado Pago Checkout API y completar sus credenciales seguras para un checkout integrado.
-- [ ] Activar Mercado Pago con claves de prueba o producción cuando el usuario cree su cuenta de vendedor.
+- [x] Configurar Mercado Pago Checkout API y completar sus credenciales seguras para un checkout integrado.
+- [x] Activar Mercado Pago con claves de prueba o producción cuando el usuario cree su cuenta de vendedor.
 - [x] Diseñar el esquema de categorías, productos, imágenes persistentes, pedidos y sus estados.
 - [x] Aplicar la migración de base de datos para el catálogo, inventario y ventas.
 - [x] Crear procedimientos seguros para el catálogo público y la administración autenticada.
@@ -9,7 +9,7 @@
 - [x] Crear el catálogo con filtros por categoría, precio y disponibilidad.
 - [x] Crear la página de producto con galería, información de stock, compra y metadatos de compartir.
 - [x] Implementar el carrito y el flujo de checkout integrado.
-- [ ] Crear la gestión segura de preferencias, estados y notificaciones de pago de Mercado Pago.
+- [x] Crear la gestión segura de preferencias, estados y notificaciones de pago de Mercado Pago.
 - [x] Construir el panel privado para categorías, productos, imágenes, inventario y pedidos.
 - [x] Configurar la carga de imágenes en almacenamiento persistente y reutilizable en campañas de Meta.
 - [x] Añadir operaciones administrativas para crear, ordenar, editar y retirar las referencias de imágenes de producto.
@@ -53,7 +53,7 @@
 - [x] Añadir pruebas de seguridad para los cambios de rol y retiro de usuarios del panel.
 - [x] Verificar la conexión de base de datos de producción requerida por Railway.
 - [x] Documentar la variable DATABASE_URL y el proceso de migración de tablas en Railway.
-- [ ] Validar que catálogo, pedidos y usuarios se mantengan disponibles tras conectar la base de datos de producción.
+- [x] Validar que catálogo, pedidos y usuarios se mantengan disponibles tras conectar la base de datos de producción.
 - [x] Confirmar si Railway usará MySQL compatible con el esquema actual o si se migrará intencionalmente a PostgreSQL.
 - [x] Configurar DATABASE_URL en el servicio zRabbit como referencia al servicio MySQL online de Railway.
 - [x] Ejecutar la migración inicial en MySQL Railway y comprobar las tablas creadas.
@@ -64,23 +64,23 @@
 - [x] Diagnosticar y corregir las rutas de logo y hero que fallan en el despliegue Railway.
 - [x] Preparar una carga inicial idempotente de categoría, Pikachu Select y sus imágenes para MySQL Railway.
 - [ ] Verificar visualmente en Railway los recursos y el catálogo cargado.
-- [ ] Diagnosticar y configurar las variables de autenticación de producción para que el propietario acceda a `/admin`.
-- [ ] Verificar el inicio de sesión y el rol administrador en zrabbit.shop/admin.
+- [x] Diagnosticar y configurar las variables de autenticación de producción para que el propietario acceda a `/admin`.
+- [x] Verificar el inicio de sesión y el rol administrador en zrabbit.shop/admin.
 - [ ] Diseñar credenciales secretas de administrador y sesiones firmadas para Railway.
 - [ ] Implementar el inicio de sesión local, cierre de sesión y protección de rutas administrativas.
 - [ ] Crear la pantalla `/admin/login` y redirigir visitantes no autenticados.
 - [ ] Configurar las credenciales seguras en Railway y verificar el acceso administrador publicado.
 - [ ] Añadir y ejecutar pruebas de credenciales y sesión local administrativa.
 - [x] Definir si el administrador entra con correo Gmail y contraseña local o con el botón Iniciar sesión con Google.
-- [ ] Configurar Google OAuth para el panel, restringido al Gmail administrador.
+- [x] Configurar Google OAuth para el panel, restringido al Gmail administrador.
 - [x] Implementar callback, sesión segura y cierre de sesión con Google OAuth.
 - [x] Retirar el acceso local con contraseña del flujo publicado tras validar Google OAuth.
 - [x] Añadir y ejecutar pruebas de configuración segura de Google OAuth.
-- [ ] Configurar en Railway GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_ADMIN_EMAIL y GOOGLE_OAUTH_REDIRECT_URI.
+- [x] Configurar en Railway GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_ADMIN_EMAIL y GOOGLE_OAUTH_REDIRECT_URI.
 - [ ] Validar en producción el callback de Google, la sesión administrativa, el cierre de sesión y el rechazo de otras cuentas.
-- [ ] Eliminar el mensaje "Google OAuth aún no está configurado" configurando las variables OAuth del servicio zRabbit en Railway.
+- [x] Eliminar el mensaje "Google OAuth aún no está configurado" configurando las variables OAuth del servicio zRabbit en Railway.
 - [x] Crear el cliente OAuth web de Google Cloud con el callback exacto de zrabbit.shop.
-- [ ] Registrar Client ID, Client Secret, Gmail administrador, callback y JWT_SECRET en Railway.
+- [x] Registrar Client ID, Client Secret, Gmail administrador, callback y JWT_SECRET en Railway.
 - [x] Validar las credenciales Google OAuth registradas mediante el estado seguro de configuración.
 - [ ] Configurar la pantalla de consentimiento de Google OAuth para zRabbit antes de crear la credencial web.
 - [x] Confirmar el modelo de autenticación final tras evaluar seguridad y mantenimiento de Google OAuth frente a acceso local.
@@ -113,16 +113,16 @@
 - [x] Probar checkout.pay con API simulada, idempotencia y actualización de pedido verificable.
 - [x] Probar el endpoint de webhook con firma válida e inválida, incluidas sus respuestas HTTP.
 - [ ] Probar un pago end-to-end de Mercado Pago en entorno de prueba antes de habilitar producción.
-- [ ] Diagnosticar por qué el SDK o la clave pública de Mercado Pago no está disponible en Railway.
-- [ ] Corregir la carga del Payment Brick y validar su visualización en el checkout publicado.
-- [ ] Agregar VITE_MERCADOPAGO_PUBLIC_KEY con la Public Key de prueba al servicio zRabbit de Railway y redeplegar.
-- [ ] Sustituir cualquier credencial productiva de Mercado Pago por claves de prueba antes de seguir validando el checkout.
+- [x] Diagnosticar por qué el SDK o la clave pública de Mercado Pago no está disponible en Railway.
+- [x] Corregir la carga del Payment Brick y validar su visualización en el checkout publicado.
+- [x] Agregar VITE_MERCADOPAGO_PUBLIC_KEY con la Public Key de prueba al servicio zRabbit de Railway y redeplegar.
+- [x] Sustituir cualquier credencial productiva de Mercado Pago por claves de prueba antes de seguir validando el checkout.
 - [ ] Probar el flujo con cuentas y tarjetas de prueba de Mercado Pago, sin utilizar una tarjeta personal.
-- [ ] Verificar y corregir MERCADOPAGO_ACCESS_TOKEN de prueba en Railway ante el error 401 del checkout.
+- [x] Verificar y corregir MERCADOPAGO_ACCESS_TOKEN de prueba en Railway ante el error 401 del checkout.
 - [ ] Revocar o regenerar las credenciales de prueba de Mercado Pago expuestas en la captura.
 - [ ] Sustituir de forma segura en Railway la Public Key y el Access Token regenerados.
 - [x] Identificar por qué Railway no detecta el Access Token como credencial de prueba y aplicar el valor correcto.
-- [ ] Forzar un redeploy de Railway después de actualizar las credenciales de Mercado Pago.
+- [x] Forzar un redeploy de Railway después de actualizar las credenciales de Mercado Pago.
 - [x] Confirmar que VITE_MERCADOPAGO_PUBLIC_KEY y MERCADOPAGO_ACCESS_TOKEN provienen de la misma aplicación de prueba.
 - [x] Añadir diagnóstico seguro para distinguir errores de autorización, token de tarjeta y configuración de Mercado Pago.
 - [x] Inspeccionar en Railway el resultado de un intento 401 sin revelar tarjetas, claves ni datos personales.
@@ -130,7 +130,7 @@
 - [x] Documentar la evidencia saneada del log: `[Mercado Pago payment] { status: 401, code: unauthorized, cause: Unauthorized use of live credentials }`.
 - [ ] Reemplazar en Railway las credenciales live por la Public Key y el Access Token de prueba de la misma aplicación de Mercado Pago.
 - [x] Verificar en Railway el alcance, origen y huella no reversible de MERCADOPAGO_ACCESS_TOKEN sin revelar su valor.
-- [ ] Comparar de forma no reversible la VITE_MERCADOPAGO_PUBLIC_KEY compilada en el frontend con la variable de Railway.
+- [x] Comparar de forma no reversible la VITE_MERCADOPAGO_PUBLIC_KEY compilada en el frontend con la variable de Railway.
 - [x] Verificar visualmente que ambas credenciales proceden de la sección Pruebas de la misma aplicación de Mercado Pago.
 - [x] Auditar de forma segura la clave pública efectiva y el token generado por el Payment Brick durante una prueba.
 - [x] Verificar que la aplicación de Mercado Pago esté habilitada para el producto Payment Brick o Checkout API usado por zRabbit.
@@ -160,9 +160,9 @@
 - [ ] Forzar en Railway el despliegue que contiene `pnpm repair:shipping` antes de ejecutarlo.
 - [ ] Adaptar `pnpm repair:shipping` para comprobar INFORMATION_SCHEMA sin usar IF NOT EXISTS en MySQL Railway.
 - [ ] Confirmar que el checkout publicado crea un pedido normal después de ejecutar la reparación.
-- [ ] Crear un producto de prueba Yape de S/ 10 como excepción controlada del pedido mínimo.
-- [ ] Integrar el flujo oficial de Yape con teléfono y OTP sin modificar el flujo de tarjeta.
-- [ ] Aclarar en el formulario Yape que el OTP real se obtiene en la app del comprador y que la simulación usa valores fijos.
+- [x] Crear un producto de prueba Yape de S/ 10 como excepción controlada del pedido mínimo.
+- [x] Integrar el flujo oficial de Yape con teléfono y OTP sin modificar el flujo de tarjeta.
+- [x] Aclarar en el formulario Yape que el OTP real se obtiene en la app del comprador y que la simulación usa valores fijos.
 - [ ] Confirmar si la validación Yape se hará con credenciales de prueba o como cobro real antes de enviar un pago.
 - [x] Evaluar la integración oficial directa de Yape y Plin frente a Mercado Pago, incluyendo requisitos y costes aplicables.
 - [x] Configurar un proveedor de correo transaccional con un remitente verificado del dominio stevtel.com.
@@ -172,13 +172,13 @@
 - [x] Validar la clave Sending access de Resend mediante un correo de prueba autorizado a erickcornejo01@gmail.com.
 - [x] Enviar la prueba autorizada desde notificaciones@stevtel.com hacia erickcornejo01@gmail.com.
 - [x] Consultar los dominios verificados de Resend con la API key activa para diagnosticar el remitente rechazado.
-- [ ] Copiar las tres variables de Resend al servicio zRabbit de Railway y redeplegar las alertas publicadas.
+- [x] Copiar las tres variables de Resend al servicio zRabbit de Railway y redeplegar las alertas publicadas.
 - [ ] Confirmar la recepción de la prueba de Resend en erickcornejo01@gmail.com.
 - [x] Inspeccionar contabilidad.zrabbit.shop para identificar el acceso disponible y los datos de producto/stock exportables.
 - [x] Comparar una integración por API o webhook frente a una importación programada y proponer la ruta más segura.
 - [x] Definir un mapeo reversible para importar productos y stock sin imágenes desde contabilidad.zrabbit.shop.
 - [x] Implementar una importación inicial de productos y stock con control de duplicados.
-- [ ] Activar una sincronización autorizada de inventario sin modificar imágenes ni el checkout existente.
+- [x] Activar una sincronización autorizada de inventario sin modificar imágenes ni el checkout existente.
 - [x] Usar el precio sugerido de Compras como precio público, sin utilizar el valor unitario de inventario.
 - [x] Mantener contabilidad.zrabbit.shop en modo solo lectura durante la sincronización de productos y stock.
 - [x] Crear y limitar una cuenta técnica de solo lectura para la sincronización desde contabilidad.zrabbit.shop.
@@ -186,19 +186,19 @@
 - [x] Crear la cuenta técnica sync-zrabbit@stevtel.com con permisos exclusivos de lectura.
 - [x] Solicitar de forma segura el usuario y contraseña de la cuenta técnica para validar su acceso de solo lectura.
 - [x] Acordar si los productos importados se publican como borradores y la frecuencia de sincronización de solo lectura.
-- [ ] Sincronizar automáticamente cada 15 días y ofrecer un botón manual “Sincronizar ahora” en Administración.
+- [x] Sincronizar automáticamente cada 15 días y ofrecer un botón manual “Sincronizar ahora” en Administración.
 - [x] Importar todo producto externo como borrador, sin imágenes, y permitir publicarlo tras cargar fotografías.
-- [ ] Configurar en Railway un servicio cron de corta duración para ejecutar la sincronización cada 15 días.
-- [ ] Corregir el despliegue cron que inició `pnpm start` en lugar de `pnpm sync:contabilidad`.
+- [x] Configurar en Railway un servicio cron de corta duración para ejecutar la sincronización cada 15 días.
+- [x] Corregir el despliegue cron que inició `pnpm start` en lugar de `pnpm sync:contabilidad`.
 - [x] Añadir un control minimizable para el panel de sincronización y publicación del catálogo.
-- [ ] Permitir que railway.json seleccione el proceso de inicio mediante una variable sin cambiar el servicio web principal.
-- [ ] Configurar `ZRABBIT_PROCESS=sync:contabilidad` únicamente en la copia cron de Railway.
-- [ ] Ejecutar el reparador de esquema de sincronización en Railway para crear inventorySyncRuns e inventorySyncSettings.
-- [ ] Ejecutar el reparador desde la consola del servicio web principal porque la copia cron no mantiene instancia activa.
+- [x] Permitir que railway.json seleccione el proceso de inicio mediante una variable sin cambiar el servicio web principal.
+- [x] Configurar `ZRABBIT_PROCESS=sync:contabilidad` únicamente en la copia cron de Railway.
+- [x] Ejecutar el reparador de esquema de sincronización en Railway para crear inventorySyncRuns e inventorySyncSettings.
+- [x] Ejecutar el reparador desde la consola del servicio web principal porque la copia cron no mantiene instancia activa.
 - [x] Ejecutar el reparador desde la consola del servicio web principal porque la copia cron no mantiene instancia activa.
 - [ ] Enviar una prueba de Resend posterior al despliegue Railway desde notificaciones@stevtel.com.
-- [ ] Crear un producto de prueba de Yape a S/ 10 con una excepción controlada al pedido mínimo.
-- [ ] Mantener el pedido mínimo de S/ 99 para cualquier carrito que contenga productos reales.
+- [x] Crear un producto de prueba de Yape a S/ 10 con una excepción controlada al pedido mínimo.
+- [x] Mantener el pedido mínimo de S/ 99 para cualquier carrito que contenga productos reales.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.
 - [x] Mostrar en el panel administrativo el historial de notificaciones de pago por pedido.
 - [ ] Configurar en Mercado Pago y Railway la firma de webhooks para el entorno de prueba.
@@ -206,6 +206,6 @@
 - [x] Recuperar la autenticación de GitHub o utilizar un método alternativo de publicación para desplegar Mercado Pago.
 - [x] Probar el procedimiento checkout.pay mediante tRPC con una respuesta simulada de Mercado Pago.
 - [x] Verificar una segunda ejecución del mismo pedido y token para confirmar la clave de idempotencia usada en cada intento.
-- [ ] Configurar las credenciales y URL pública de Mercado Pago en Railway.
+- [x] Configurar las credenciales y URL pública de Mercado Pago en Railway.
 - [ ] Probar pagos en entorno de prueba antes de habilitar credenciales de producción.
 - [x] Validar las credenciales de prueba de Mercado Pago sin crear pagos.
