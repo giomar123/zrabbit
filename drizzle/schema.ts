@@ -93,6 +93,22 @@ export const orders = mysqlTable("orders", {
   index("orders_mp_payment_idx").on(table.mercadoPagoPaymentId),
 ]);
 
+export const customerAddresses = mysqlTable("customerAddresses", {
+  id: int("id").autoincrement().primaryKey(),
+  customerEmail: varchar("customerEmail", { length: 320 }).notNull(),
+  label: varchar("label", { length: 80 }).notNull(),
+  recipientName: varchar("recipientName", { length: 160 }).notNull(),
+  phone: varchar("phone", { length: 40 }),
+  address: text("address").notNull(),
+  district: varchar("district", { length: 120 }).notNull(),
+  isDefault: boolean("isDefault").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => [
+  index("customer_addresses_email_idx").on(table.customerEmail),
+  index("customer_addresses_default_idx").on(table.customerEmail, table.isDefault),
+]);
+
 export const orderItems = mysqlTable("orderItems", {
   id: int("id").autoincrement().primaryKey(),
   orderId: int("orderId").notNull(),
@@ -144,6 +160,7 @@ export type Category = typeof categories.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type ProductImage = typeof productImages.$inferSelect;
 export type Order = typeof orders.$inferSelect;
+export type CustomerAddress = typeof customerAddresses.$inferSelect;
 export type PaymentEvent = typeof paymentEvents.$inferSelect;
 export type InventorySyncRun = typeof inventorySyncRuns.$inferSelect;
 export type InventorySyncSettings = typeof inventorySyncSettings.$inferSelect;

@@ -1,7 +1,7 @@
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { authorizedGoogleEmails, categories, orderItems, orders, paymentEvents, productImages, products, users } from "../drizzle/schema";
+import { authorizedGoogleEmails, categories, customerAddresses, orderItems, orders, paymentEvents, productImages, products, users } from "../drizzle/schema";
 import { createPendingOrder, getCatalogProductBySlug, listActiveCategories, listCatalogProducts } from "./catalog";
 import { getContabilidadSyncSettings, listContabilidadSyncRuns, previewContabilidadImport, runContabilidadImport } from "./contabilidadSync";
 import { getDb } from "./db";
@@ -21,6 +21,15 @@ const productInput = z.object({
   priceInCents: z.number().int().min(1), compareAtPriceInCents: z.number().int().min(1).nullable().optional(), stock: z.number().int().min(0),
   status: z.enum(["draft", "active", "archived"]), isFeatured: z.boolean().default(false), isOffer: z.boolean().default(false), mainImageUrl: z.string().url().nullable().optional(),
   metaTitle: z.string().trim().max(180).optional(), metaDescription: z.string().trim().max(300).optional(),
+});
+const customerAddressInput = z.object({
+  id: z.number().int().positive().optional(),
+  label: z.string().trim().min(2).max(80),
+  recipientName: z.string().trim().min(3).max(160),
+  phone: z.string().trim().max(40).optional(),
+  address: z.string().trim().min(8).max(1000),
+  district: z.string().trim().min(2).max(120),
+  isDefault: z.boolean().default(false),
 });
 
 async function requireDb() {
@@ -56,6 +65,39 @@ export const appRouter = router({
       const itemRows = orderIds.length ? await db.select({ id: orderItems.id, orderId: orderItems.orderId, productName: orderItems.productName, imageUrl: orderItems.imageUrl, unitPriceInCents: orderItems.unitPriceInCents, quantity: orderItems.quantity }).from(orderItems).where(inArray(orderItems.orderId, orderIds)) : [];
       return orderRows.map(order => ({ ...order, items: itemRows.filter(item => item.orderId === order.id) }));
     }),
+    addresses: router({
+      list: customerProcedure.query(async ({ ctx }) => {
+        const db = await requireDb(); const email = ctx.customer.email.trim().toLowerCase();
+        return db.select().from(customerAddresses).where(sql`LOWER(${customerAddresses.customerEmail}) = ${email}`).orderBy(desc(customerAddresses.isDefault), desc(customerAddresses.updatedAt));
+      }),
+      save: customerProcedure.input(customerAddressInput).mutation(async ({ ctx, input }) => {
+        const db = await requireDb(); const email = ctx.customer.email.trim().toLowerCase();
+        const owned = await db.select().from(customerAddresses).where(sql`LOWER(${customerAddresses.customerEmail}) = ${email}`).orderBy(desc(customerAddresses.isDefault), desc(customerAddresses.updatedAt));
+        const current = input.id ? owned.find(address => address.id === input.id) : undefined;
+        if (input.id && !current) throw new TRPCError({ code: "NOT_FOUND", message: "La dirección no existe." });
+        const isDefault = input.isDefault || !owned.length || Boolean(current?.isDefault);
+        if (isDefault) await db.update(customerAddresses).set({ isDefault: false }).where(sql`LOWER(${customerAddresses.customerEmail}) = ${email}`);
+        const values = { customerEmail: email, label: input.label, recipientName: input.recipientName, phone: input.phone || null, address: input.address, district: input.district, isDefault };
+        if (current) {
+          await db.update(customerAddresses).set(values).where(and(eq(customerAddresses.id, current.id), sql`LOWER(${customerAddresses.customerEmail}) = ${email}`));
+          return { id: current.id, isDefault };
+        }
+        const result = await db.insert(customerAddresses).values(values);
+        return { id: Number(result[0].insertId), isDefault };
+      }),
+      remove: customerProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+        const db = await requireDb(); const email = ctx.customer.email.trim().toLowerCase();
+        const owned = await db.select().from(customerAddresses).where(sql`LOWER(${customerAddresses.customerEmail}) = ${email}`).orderBy(desc(customerAddresses.isDefault), desc(customerAddresses.updatedAt));
+        const current = owned.find(address => address.id === input.id);
+        if (!current) return { success: true };
+        await db.delete(customerAddresses).where(and(eq(customerAddresses.id, current.id), sql`LOWER(${customerAddresses.customerEmail}) = ${email}`));
+        if (current.isDefault) {
+          const [replacement] = owned.filter(address => address.id !== current.id);
+          if (replacement) await db.update(customerAddresses).set({ isDefault: true }).where(eq(customerAddresses.id, replacement.id));
+        }
+        return { success: true };
+      }),
+    }),
   }),
   catalog: router({
     categories: publicProcedure.query(() => listActiveCategories()),
@@ -67,7 +109,24 @@ export const appRouter = router({
       customerName: z.string().trim().min(3).max(160), customerEmail: z.string().email(), customerPhone: z.string().trim().max(40).optional(),
       shippingAddress: z.string().trim().min(8).max(1000).optional(), shippingDistrict: z.string().trim().max(120).optional(),
       items: z.array(z.object({ productId: z.number().int().positive(), quantity: z.number().int().min(1).max(10) })).min(1).max(20),
-    })).mutation(({ input }) => createPendingOrder(input)),
+    })).mutation(async ({ ctx, input }) => {
+      const order = await createPendingOrder(input);
+      const customerEmail = ctx.customer?.email.trim().toLowerCase();
+      const orderEmail = input.customerEmail.trim().toLowerCase();
+      if (customerEmail && customerEmail === orderEmail && input.shippingAddress && input.shippingDistrict) {
+        try {
+          const db = await requireDb();
+          const saved = await db.select().from(customerAddresses).where(and(sql`LOWER(${customerAddresses.customerEmail}) = ${customerEmail}`, eq(customerAddresses.address, input.shippingAddress.trim()), eq(customerAddresses.district, input.shippingDistrict.trim()))).limit(1);
+          if (!saved[0]) {
+            const current = await db.select({ id: customerAddresses.id }).from(customerAddresses).where(sql`LOWER(${customerAddresses.customerEmail}) = ${customerEmail}`).limit(1);
+            await db.insert(customerAddresses).values({ customerEmail, label: "Dirección principal", recipientName: input.customerName.trim(), phone: input.customerPhone?.trim() || null, address: input.shippingAddress.trim(), district: input.shippingDistrict.trim(), isDefault: current.length === 0 });
+          }
+        } catch (error) {
+          console.error("[Customer addresses] No se pudo guardar la dirección del checkout", error);
+        }
+      }
+      return order;
+    }),
     webhookStatus: publicProcedure.query(() => ({ configured: isMercadoPagoWebhookConfigured() })),
     pay: publicProcedure.input(z.object({ orderId: z.number().int().positive(), token: z.string().min(10), paymentMethodId: z.string().min(1), issuerId: z.string().optional(), installments: z.number().int().min(1).max(48), payerEmail: z.string().email(), identificationType: z.string().optional(), identificationNumber: z.string().optional(), clientPublicKeyPrefix: z.string().max(12).optional(), clientPublicKeyFingerprint: z.string().regex(/^[a-f0-9]{12}$/).optional() })).mutation(async ({ input }) => {
       try { return await createMercadoPagoPayment(input); }
