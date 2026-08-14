@@ -173,7 +173,7 @@
 - [x] Enviar la prueba autorizada desde notificaciones@stevtel.com hacia erickcornejo01@gmail.com.
 - [x] Consultar los dominios verificados de Resend con la API key activa para diagnosticar el remitente rechazado.
 - [x] Copiar las tres variables de Resend al servicio zRabbit de Railway y redeplegar las alertas publicadas.
-- [ ] Confirmar la recepción de la prueba de Resend en erickcornejo01@gmail.com.
+- [x] Confirmar la recepción de la prueba de Resend en erickcornejo01@gmail.com.
 - [x] Inspeccionar contabilidad.zrabbit.shop para identificar el acceso disponible y los datos de producto/stock exportables.
 - [x] Comparar una integración por API o webhook frente a una importación programada y proponer la ruta más segura.
 - [x] Definir un mapeo reversible para importar productos y stock sin imágenes desde contabilidad.zrabbit.shop.
@@ -209,3 +209,10 @@
 - [x] Configurar las credenciales y URL pública de Mercado Pago en Railway.
 - [ ] Probar pagos en entorno de prueba antes de habilitar credenciales de producción.
 - [x] Validar las credenciales de prueba de Mercado Pago sin crear pagos.
+
+- [ ] Confirmar un pago Yape real de bajo importe con una cuenta oficial y verificar su actualización en Administración.
+- [ ] Completar fotografías y publicar de forma controlada los productos importados que permanecen en borrador.
+- [ ] Añadir búsqueda textual de productos al catálogo público para encontrar figuras por nombre, saga o personaje.
+- [ ] Añadir gestión operativa de pedidos: marcar envío por Shalom, registrar código de envío y notificar al cliente.
+- [ ] Crear una consulta pública y segura del estado de pedido para que el cliente pueda revisar pago y despacho.
+- [ ] Configurar medición de conversiones de Meta y Google para campañas publicitarias por producto.
