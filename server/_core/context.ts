@@ -1,12 +1,13 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { authenticateGoogleAdmin } from "./googleAuth";
+import { authenticateGoogleAdmin, authenticateGoogleCustomer, type GoogleCustomerIdentity } from "./googleAuth";
 import { sdk } from "./sdk";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
   res: CreateExpressContextOptions["res"];
   user: User | null;
+  customer?: GoogleCustomerIdentity | null;
 };
 
 export async function createContext(
@@ -24,9 +25,11 @@ export async function createContext(
     }
   }
 
+  const customer = await authenticateGoogleCustomer(opts.req);
   return {
     req: opts.req,
     res: opts.res,
     user,
+    customer,
   };
 }

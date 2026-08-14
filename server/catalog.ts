@@ -68,7 +68,7 @@ export async function createPendingOrder(input: { customerName: string; customer
   const isYapeTestOnly = enriched.length > 0 && enriched.every(item => item.product.slug === YAPE_TEST_PRODUCT_SLUG);
   validateMinimumOrder(totalInCents, isYapeTestOnly);
   const orderNumber = `FC-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-  const result = await db.insert(orders).values({ orderNumber, customerName: input.customerName, customerEmail: input.customerEmail, customerPhone: input.customerPhone, shippingAddress: input.shippingAddress, shippingDistrict: input.shippingDistrict, shippingMethod: isYapeTestOnly ? "yape_test" : "shalom", isFreeShipping: isYapeTestOnly || qualifiesForFreeShipping(totalInCents), totalInCents, status: "awaiting_payment" });
+  const result = await db.insert(orders).values({ orderNumber, customerName: input.customerName, customerEmail: input.customerEmail.trim().toLowerCase(), customerPhone: input.customerPhone, shippingAddress: input.shippingAddress, shippingDistrict: input.shippingDistrict, shippingMethod: isYapeTestOnly ? "yape_test" : "shalom", isFreeShipping: isYapeTestOnly || qualifiesForFreeShipping(totalInCents), totalInCents, status: "awaiting_payment" });
   const orderId = Number(result[0].insertId);
   await db.insert(orderItems).values(enriched.map(({ product, quantity, subtotal }) => ({ orderId, productId: product.id, productName: product.name, imageUrl: product.mainImageUrl, unitPriceInCents: product.priceInCents, quantity, subtotalInCents: subtotal })));
   await notifyOrderCreated({ orderNumber, totalInCents, shippingMethod: isYapeTestOnly ? "yape_test" : "shalom", items: enriched.map(({ product, quantity }) => ({ productName: product.name, quantity })) });

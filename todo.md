@@ -214,5 +214,6 @@
 - [ ] Completar fotografías y publicar de forma controlada los productos importados que permanecen en borrador.
 - [ ] Añadir búsqueda textual de productos al catálogo público para encontrar figuras por nombre, saga o personaje.
 - [ ] Añadir gestión operativa de pedidos: marcar envío por Shalom, registrar código de envío y notificar al cliente.
-- [ ] Crear una consulta pública y segura del estado de pedido para que el cliente pueda revisar pago y despacho.
+- [x] Crear una consulta pública y segura del estado de pedido para que el cliente pueda revisar pago y despacho.
+- [x] Permitir que el cliente inicie sesión con Gmail y vea exclusivamente sus propios pedidos.
 - [ ] Configurar medición de conversiones de Meta y Google para campañas publicitarias por producto.

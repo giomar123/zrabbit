@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { appRouter } from "./routers";
 import { COOKIE_NAME } from "../shared/const";
-import { GOOGLE_SESSION_COOKIE } from "./_core/googleAuth";
+import { GOOGLE_CUSTOMER_SESSION_COOKIE, GOOGLE_SESSION_COOKIE } from "./_core/googleAuth";
 import type { TrpcContext } from "./_core/context";
 
 type CookieCall = {
@@ -43,16 +43,17 @@ function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] }
 }
 
 describe("auth.logout", () => {
-  it("clears inherited and Google administrative session cookies", async () => {
+  it("clears inherited, administrative and customer session cookies", async () => {
     const { ctx, clearedCookies } = createAuthContext();
     const caller = appRouter.createCaller(ctx);
 
     const result = await caller.auth.logout();
 
     expect(result).toEqual({ success: true });
-    expect(clearedCookies).toHaveLength(2);
+    expect(clearedCookies).toHaveLength(3);
     expect(clearedCookies[0]?.name).toBe(COOKIE_NAME);
     expect(clearedCookies[1]?.name).toBe(GOOGLE_SESSION_COOKIE);
+    expect(clearedCookies[2]?.name).toBe(GOOGLE_CUSTOMER_SESSION_COOKIE);
     expect(clearedCookies[0]?.options).toMatchObject({
       maxAge: -1,
       secure: true,

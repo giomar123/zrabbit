@@ -21,6 +21,10 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
     window.location.assign("/admin/login");
     return;
   }
+  if (window.location.pathname.startsWith("/mis-pedidos")) {
+    window.location.assign("/api/auth/customer/google/login");
+    return;
+  }
   startLogin();
 };
 

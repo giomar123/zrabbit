@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { authorizedGoogleEmails, categories, orderItems, orders, paymentEvents, productImages, products, users } from "../drizzle/schema";
@@ -8,10 +8,10 @@ import { getDb } from "./db";
 import { storagePut } from "./storage";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
-import { isGoogleAuthConfigured, logoutGoogleAdmin } from "./_core/googleAuth";
+import { isGoogleAuthConfigured, logoutGoogleAdmin, logoutGoogleCustomer } from "./_core/googleAuth";
 import { createMercadoPagoPayment, isMercadoPagoWebhookConfigured } from "./mercadoPago";
 import { systemRouter } from "./_core/systemRouter";
-import { adminProcedure, catalogEditorProcedure, publicProcedure, router } from "./_core/trpc";
+import { adminProcedure, catalogEditorProcedure, customerProcedure, publicProcedure, router } from "./_core/trpc";
 
 const slugSchema = z.string().trim().min(2).max(200).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Usa minúsculas, números y guiones.");
 const categoryInput = z.object({ id: z.number().int().positive().optional(), name: z.string().trim().min(2).max(100), slug: slugSchema.max(120), description: z.string().trim().max(1000).optional(), accentColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/), isActive: z.boolean().default(true) });
@@ -38,7 +38,23 @@ export const appRouter = router({
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       logoutGoogleAdmin(ctx.req, ctx.res);
+      logoutGoogleCustomer(ctx.req, ctx.res);
       return { success: true } as const;
+    }),
+  }),
+  customer: router({
+    me: publicProcedure.query(({ ctx }) => ctx.customer ?? null),
+    logout: publicProcedure.mutation(({ ctx }) => { logoutGoogleCustomer(ctx.req, ctx.res); return { success: true } as const; }),
+    orders: customerProcedure.query(async ({ ctx }) => {
+      const db = await requireDb();
+      const email = ctx.customer.email.trim().toLowerCase();
+      const orderRows = await db.select({
+        id: orders.id, orderNumber: orders.orderNumber, totalInCents: orders.totalInCents, currency: orders.currency,
+        status: orders.status, shippingMethod: orders.shippingMethod, isFreeShipping: orders.isFreeShipping, createdAt: orders.createdAt, updatedAt: orders.updatedAt,
+      }).from(orders).where(sql`LOWER(${orders.customerEmail}) = ${email}`).orderBy(desc(orders.createdAt));
+      const orderIds = orderRows.map(order => order.id);
+      const itemRows = orderIds.length ? await db.select({ id: orderItems.id, orderId: orderItems.orderId, productName: orderItems.productName, imageUrl: orderItems.imageUrl, unitPriceInCents: orderItems.unitPriceInCents, quantity: orderItems.quantity }).from(orderItems).where(inArray(orderItems.orderId, orderIds)) : [];
+      return orderRows.map(order => ({ ...order, items: itemRows.filter(item => item.orderId === order.id) }));
     }),
   }),
   catalog: router({
