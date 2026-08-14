@@ -8,13 +8,13 @@ describe("ticket de compra", () => {
   it("desglosa un precio final en subtotal e IGV incluido sin alterar el total", () => {
     const totals = purchaseTicketInternals.calculateTicketBreakdown(20_003);
     expect(totals.subtotalInCents + totals.igvInCents).toBe(20_003);
-    expect(totals.subtotalInCents).toBe(Math.round(20_003 / 1.22));
+    expect(totals.subtotalInCents).toBe(Math.round(20_003 / 1.18));
     expect(totals.igvInCents).toBe(20_003 - totals.subtotalInCents);
   });
 
   it("incluye líneas, envío y la advertencia de comprobante en el ticket HTML", () => {
     const html = purchaseTicketInternals.buildPurchaseTicketHtml({ orderNumber: "ZR-0001", customerName: "Cliente", customerEmail: "cliente@example.com", shippingMethod: "shalom", isFreeShipping: true, totalInCents: 9_900, items: [{ productName: "Figura <especial>", quantity: 1, unitPriceInCents: 9_900, subtotalInCents: 9_900 }] });
-    expect(html).toContain("IGV (22%) incluido");
+    expect(html).toContain("IGV (18%) incluido");
     expect(html).toContain("Envío gratis por Shalom");
     expect(html).toContain("Figura &lt;especial&gt;");
     expect(html).toContain("No sustituye un comprobante");

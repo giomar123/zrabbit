@@ -232,3 +232,5 @@
 - [x] Generar un ticket de compra privado con productos, envío, subtotal, IGV y total para cada pago aprobado.
 - [x] Mostrar el ticket al cliente autenticado dentro de Mis pedidos sin exponer pedidos ajenos.
 - [x] Enviar el ticket de compra por correo con una versión PDF adjunta tras la aprobación del pago.
+- [x] Ajustar el ticket de compra para calcular y mostrar IGV incluido de 18 %.
+- [ ] Confirmar en producción la recepción del correo de compra con el ticket PDF adjunto.
