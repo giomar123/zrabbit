@@ -221,3 +221,4 @@
 - [x] Permitir crear, editar, eliminar y marcar una dirección predeterminada sin acceder a datos de otros clientes.
 - [x] Reutilizar la dirección predeterminada del cliente dentro del checkout y permitir cambiarla para cada pedido.
 - [ ] Aplicar en Railway la migración 0009 que crea la libreta de direcciones de clientes.
+- [ ] Crear y ejecutar en Railway un reparador idempotente de la tabla customerAddresses sin repetir la migración 0006 de envíos.

@@ -14,6 +14,7 @@
     "seed:railway": "node scripts/seed-railway.mjs",
     "seed:yape-test": "node scripts/seed-yape-test.mjs",
     "repair:shipping": "node scripts/repair-shipping.mjs",
+    "repair:addresses": "node scripts/repair-customer-addresses.mjs",
     "repair:sync-schema": "node scripts/repair-sync-schema.mjs",
     "sync:contabilidad": "NODE_ENV=production node dist/sync-contabilidad.js"
   },
