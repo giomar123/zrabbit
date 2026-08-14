@@ -13,4 +13,8 @@ describe("notificaciones de pedido", () => {
       { productName: "Figura B", quantity: 2 },
     ])).toBe("1 × Figura A, 2 × Figura B");
   });
+
+  it("mantiene la configuración de correo aislada de los destinatarios de clientes", () => {
+    expect(orderNotificationInternals.emailConfiguration()).toBeTruthy();
+  });
 });

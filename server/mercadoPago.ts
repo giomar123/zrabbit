@@ -1,7 +1,7 @@
 import type express from "express";
 import { createHash, createHmac, timingSafeEqual } from "crypto";
 import { eq } from "drizzle-orm";
-import { orders, paymentEvents } from "../drizzle/schema";
+import { orderItems, orders, paymentEvents } from "../drizzle/schema";
 import { getDb } from "./db";
 import { notifyPaymentApproved } from "./orderNotifications";
 import { syncApprovedOrderToContabilidad } from "./contabilidadSales";
@@ -74,6 +74,12 @@ export async function verifyMercadoPagoAccess(): Promise<{ paymentMethods: numbe
 
 export function isMercadoPagoWebhookConfigured() { return Boolean(process.env.MERCADOPAGO_WEBHOOK_SECRET); }
 
+async function notifyApprovedOrder(order: typeof orders.$inferSelect, paymentId?: string | null) {
+  const db = await getDb(); if (!db) return;
+  const items = await db.select({ productName: orderItems.productName, quantity: orderItems.quantity, unitPriceInCents: orderItems.unitPriceInCents, subtotalInCents: orderItems.subtotalInCents }).from(orderItems).where(eq(orderItems.orderId, order.id));
+  await notifyPaymentApproved({ orderNumber: order.orderNumber, totalInCents: order.totalInCents, paymentId, customerName: order.customerName, customerEmail: order.customerEmail, shippingMethod: order.shippingMethod, isFreeShipping: order.isFreeShipping, items, createdAt: order.createdAt });
+}
+
 export function verifyMercadoPagoWebhookSignature(input: { signature?: string; requestId?: string; dataId?: string }) {
   const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
   if (!secret || !input.signature || !input.requestId || !input.dataId) return false;
@@ -104,7 +110,7 @@ export async function createMercadoPagoPayment(input: { orderId: number; token: 
   const status = toStoreStatus(payment.status);
   await db.update(orders).set({ status, mercadoPagoPaymentId: payment.id ? String(payment.id) : null, mercadoPagoStatus: payment.status ?? null }).where(eq(orders.id, order.id));
   if (status === "paid") {
-    await notifyPaymentApproved({ orderNumber: order.orderNumber, totalInCents: order.totalInCents, paymentId: payment.id ? String(payment.id) : null });
+    await notifyApprovedOrder(order, payment.id ? String(payment.id) : null);
     await syncApprovedOrderToContabilidad(order.id);
   }
   return { orderNumber: order.orderNumber, paymentId: payment.id ? String(payment.id) : null, status, mercadoPagoStatus: payment.status ?? "pending", detail: payment.status_detail ?? null };
@@ -119,7 +125,7 @@ export async function syncMercadoPagoPayment(paymentId: string) {
   const status = toStoreStatus(payment.status);
   await db.update(orders).set({ status, mercadoPagoPaymentId: payment.id ? String(payment.id) : paymentId, mercadoPagoStatus: payment.status ?? null }).where(eq(orders.id, order.id));
   if (status === "paid") {
-    if (order.status !== "paid") await notifyPaymentApproved({ orderNumber: order.orderNumber, totalInCents: order.totalInCents, paymentId: payment.id ? String(payment.id) : paymentId });
+    if (order.status !== "paid") await notifyApprovedOrder(order, payment.id ? String(payment.id) : paymentId);
     await syncApprovedOrderToContabilidad(order.id);
   }
   return { synchronized: true, status, orderId: order.id, providerStatus: payment.status ?? null };

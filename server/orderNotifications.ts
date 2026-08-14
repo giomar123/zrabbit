@@ -1,5 +1,7 @@
 type OrderEmailItem = { productName: string; quantity: number };
 
+import { buildPurchaseTicketHtml, createPurchaseTicketPdf, PurchaseTicketInput } from "./purchaseTicket";
+
 type OrderEmailInput = {
   orderNumber: string;
   totalInCents: number;
@@ -33,7 +35,7 @@ function emailConfiguration() {
   };
 }
 
-async function sendOrderEmail(subject: string, html: string, text: string) {
+async function sendOrderEmail(subject: string, html: string, text: string, options?: { to?: string; attachments?: Array<{ filename: string; content: string }>; idempotencyKey?: string }) {
   if (process.env.VITEST) return { sent: false, reason: "test_environment" as const };
   const config = emailConfiguration();
   if (!config) return { sent: false, reason: "missing_configuration" as const };
@@ -44,8 +46,9 @@ async function sendOrderEmail(subject: string, html: string, text: string) {
       headers: {
         Authorization: `Bearer ${config.apiKey}`,
         "Content-Type": "application/json",
+        ...(options?.idempotencyKey ? { "Idempotency-Key": options.idempotencyKey } : {}),
       },
-      body: JSON.stringify({ from: config.from, to: [config.to], subject, html, text }),
+      body: JSON.stringify({ from: config.from, to: [options?.to ?? config.to], subject, html, text, ...(options?.attachments ? { attachments: options.attachments } : {}) }),
     });
     if (!response.ok) {
       console.error("[Order notification] Resend rechazó el envío", { status: response.status });
@@ -71,12 +74,23 @@ export async function notifyOrderCreated(input: OrderEmailInput) {
   return sendOrderEmail(subject, html, text);
 }
 
-export async function notifyPaymentApproved(input: Pick<OrderEmailInput, "orderNumber" | "totalInCents"> & { paymentId?: string | null }) {
+type PaymentApprovedInput = Pick<OrderEmailInput, "orderNumber" | "totalInCents"> & Partial<Pick<PurchaseTicketInput, "customerName" | "customerEmail" | "shippingMethod" | "isFreeShipping" | "items" | "createdAt">> & { paymentId?: string | null };
+
+export async function notifyPaymentApproved(input: PaymentApprovedInput) {
   const subject = `Pago aprobado ${input.orderNumber} · ${formatCurrency(input.totalInCents)}`;
   const paymentReference = input.paymentId ? `<p><strong>Referencia Mercado Pago:</strong> ${htmlEscape(input.paymentId)}</p>` : "";
   const html = `<main style="font-family:Arial,sans-serif;color:#142235;line-height:1.5"><h1 style="margin:0 0 16px">Pago aprobado en zRabbit</h1><p><strong>Pedido:</strong> ${htmlEscape(input.orderNumber)}</p><p><strong>Total cobrado:</strong> ${formatCurrency(input.totalInCents)}</p>${paymentReference}<p style="color:#5b6573">El pedido ya figura como pagado. Revísalo en Administración → Pedidos.</p></main>`;
   const text = `Pago aprobado en zRabbit\nPedido: ${input.orderNumber}\nTotal cobrado: ${formatCurrency(input.totalInCents)}${input.paymentId ? `\nReferencia Mercado Pago: ${input.paymentId}` : ""}`;
-  return sendOrderEmail(subject, html, text);
+  const admin = await sendOrderEmail(subject, html, text);
+  if (!input.customerEmail || !input.customerName || !input.items || input.isFreeShipping === undefined) return { admin, ticket: { sent: false as const, reason: "missing_ticket_data" as const } };
+  const ticketInput: PurchaseTicketInput = { orderNumber: input.orderNumber, totalInCents: input.totalInCents, customerName: input.customerName, customerEmail: input.customerEmail, shippingMethod: input.shippingMethod ?? "shalom", isFreeShipping: input.isFreeShipping, items: input.items, paymentId: input.paymentId, createdAt: input.createdAt };
+  try {
+    const pdf = await createPurchaseTicketPdf(ticketInput);
+    const ticketSubject = `Tu ticket de compra ${input.orderNumber} · ${formatCurrency(input.totalInCents)}`;
+    const ticketText = `Pago confirmado\nPedido: ${input.orderNumber}\nTotal pagado: ${formatCurrency(input.totalInCents)}\nEl ticket PDF está adjunto.`;
+    const ticket = await sendOrderEmail(ticketSubject, buildPurchaseTicketHtml(ticketInput), ticketText, { to: input.customerEmail, attachments: [{ filename: `ticket-${input.orderNumber}.pdf`, content: pdf.toString("base64") }], idempotencyKey: `ticket-${input.orderNumber}-${input.paymentId ?? "approved"}` });
+    return { admin, ticket };
+  } catch (error) { console.error("[Purchase ticket] No se pudo preparar el ticket", error); return { admin, ticket: { sent: false as const, reason: "ticket_generation_failed" as const } }; }
 }
 
 export const orderNotificationInternals = { emailConfiguration, formatCurrency, htmlEscape, itemsList };
