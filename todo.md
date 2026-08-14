@@ -164,6 +164,14 @@
 - [ ] Integrar el flujo oficial de Yape con teléfono y OTP sin modificar el flujo de tarjeta.
 - [ ] Aclarar en el formulario Yape que el OTP real se obtiene en la app del comprador y que la simulación usa valores fijos.
 - [ ] Confirmar si la validación Yape se hará con credenciales de prueba o como cobro real antes de enviar un pago.
+- [ ] Evaluar la integración oficial directa de Yape y Plin frente a Mercado Pago, incluyendo requisitos y costes aplicables.
+- [ ] Configurar un proveedor de correo transaccional con un remitente verificado del dominio stevtel.com.
+- [ ] Enviar una notificación al administrador al crear un pedido y al confirmarse el pago.
+- [ ] Definir el remitente stevtel.com y el correo administrador destinatario para los avisos de Resend.
+- [ ] Configurar las alertas de Resend hacia erickcornejo01@gmail.com desde el remitente verificado de stevtel.com.
+- [ ] Validar la clave Sending access de Resend mediante un correo de prueba autorizado a erickcornejo01@gmail.com.
+- [ ] Enviar la prueba autorizada desde notificaciones@stevtel.com hacia erickcornejo01@gmail.com.
+- [ ] Consultar los dominios verificados de Resend con la API key activa para diagnosticar el remitente rechazado.
 - [ ] Crear un producto de prueba de Yape a S/ 10 con una excepción controlada al pedido mínimo.
 - [ ] Mantener el pedido mínimo de S/ 99 para cualquier carrito que contenga productos reales.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.

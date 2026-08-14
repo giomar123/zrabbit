@@ -3,6 +3,7 @@ import { createHash, createHmac, timingSafeEqual } from "crypto";
 import { eq } from "drizzle-orm";
 import { orders, paymentEvents } from "../drizzle/schema";
 import { getDb } from "./db";
+import { notifyPaymentApproved } from "./orderNotifications";
 
 type StoreOrderStatus = "awaiting_payment" | "paid" | "cancelled";
 type MercadoPayment = { id?: string | number; status?: string; status_detail?: string; external_reference?: string; transaction_amount?: number };
@@ -88,6 +89,7 @@ export async function createMercadoPagoPayment(input: { orderId: number; token: 
   catch (error) { console.warn("[Mercado Pago credential trace]", getMercadoPagoSafeTrace({ cardToken: input.token, clientPublicKeyPrefix: input.clientPublicKeyPrefix, clientPublicKeyFingerprint: input.clientPublicKeyFingerprint })); throw error; }
   const status = toStoreStatus(payment.status);
   await db.update(orders).set({ status, mercadoPagoPaymentId: payment.id ? String(payment.id) : null, mercadoPagoStatus: payment.status ?? null }).where(eq(orders.id, order.id));
+  if (status === "paid") await notifyPaymentApproved({ orderNumber: order.orderNumber, totalInCents: order.totalInCents, paymentId: payment.id ? String(payment.id) : null });
   return { orderNumber: order.orderNumber, paymentId: payment.id ? String(payment.id) : null, status, mercadoPagoStatus: payment.status ?? "pending", detail: payment.status_detail ?? null };
 }
 
@@ -99,6 +101,7 @@ export async function syncMercadoPagoPayment(paymentId: string) {
   if (!order || Math.round((payment.transaction_amount ?? 0) * 100) !== order.totalInCents) return { synchronized: false, reason: "order_not_found_or_amount_mismatch", providerStatus: payment.status ?? null };
   const status = toStoreStatus(payment.status);
   await db.update(orders).set({ status, mercadoPagoPaymentId: payment.id ? String(payment.id) : paymentId, mercadoPagoStatus: payment.status ?? null }).where(eq(orders.id, order.id));
+  if (status === "paid" && order.status !== "paid") await notifyPaymentApproved({ orderNumber: order.orderNumber, totalInCents: order.totalInCents, paymentId: payment.id ? String(payment.id) : paymentId });
   return { synchronized: true, status, orderId: order.id, providerStatus: payment.status ?? null };
 }
 
