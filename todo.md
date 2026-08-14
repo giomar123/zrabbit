@@ -222,3 +222,9 @@
 - [x] Reutilizar la dirección predeterminada del cliente dentro del checkout y permitir cambiarla para cada pedido.
 - [ ] Aplicar en Railway la migración 0009 que crea la libreta de direcciones de clientes.
 - [ ] Crear y ejecutar en Railway un reparador idempotente de la tabla customerAddresses sin repetir la migración 0006 de envíos.
+- [x] Retirar de zRabbit la edición operativa de productos, precios y stock para que contabilidad sea la fuente única.
+- [ ] Registrar cada pago aprobado de zRabbit en contabilidad de forma idempotente para descontar el inventario real una sola vez.
+- [ ] Sincronizar el resultado de la venta y el stock actualizado desde contabilidad hacia zRabbit sin modificar fotografías ni el checkout.
+- [x] Crear y validar una cuenta técnica de contabilidad con el nuevo rol exclusivo de registro de ventas.
+- [x] Usar el número de pedido de zRabbit como referencia idempotente de cada venta enviada a contabilidad.
+- [x] Confirmar que `sales.create` acepta y deduplica la referencia externa de un pedido de zRabbit.

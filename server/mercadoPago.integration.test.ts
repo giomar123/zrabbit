@@ -12,6 +12,8 @@ import type { TrpcContext } from "./_core/context";
 const realFetch = global.fetch;
 const originalSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
 const originalToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+const originalSalesUsername = process.env.CONTABILIDAD_SALES_USERNAME;
+const originalSalesPassword = process.env.CONTABILIDAD_SALES_PASSWORD;
 
 async function createTestOrder() {
   const db = await getDb(); if (!db) throw new Error("Base de datos no disponible para prueba.");
@@ -35,6 +37,8 @@ afterEach(() => {
   global.fetch = realFetch;
   if (originalSecret === undefined) delete process.env.MERCADOPAGO_WEBHOOK_SECRET; else process.env.MERCADOPAGO_WEBHOOK_SECRET = originalSecret;
   if (originalToken === undefined) delete process.env.MERCADOPAGO_ACCESS_TOKEN; else process.env.MERCADOPAGO_ACCESS_TOKEN = originalToken;
+  if (originalSalesUsername === undefined) delete process.env.CONTABILIDAD_SALES_USERNAME; else process.env.CONTABILIDAD_SALES_USERNAME = originalSalesUsername;
+  if (originalSalesPassword === undefined) delete process.env.CONTABILIDAD_SALES_PASSWORD; else process.env.CONTABILIDAD_SALES_PASSWORD = originalSalesPassword;
 });
 
 describe("flujo integrado Mercado Pago", () => {
@@ -54,6 +58,7 @@ describe("flujo integrado Mercado Pago", () => {
 
   it("crea un pago idempotente y persiste su estado aprobado", async () => {
     const { db, order, productId, originalStock } = await createTestOrder(); const calls: RequestInit[] = [];
+    delete process.env.CONTABILIDAD_SALES_USERNAME; delete process.env.CONTABILIDAD_SALES_PASSWORD;
     global.fetch = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => { calls.push(init ?? {}); return new Response(JSON.stringify({ id: 123456, status: "approved", status_detail: "accredited" }), { status: 201, headers: { "Content-Type": "application/json" } }); }) as typeof fetch;
     try {
       const result = await createMercadoPagoPayment({ orderId: order.id, token: "test-payment-token-123456", paymentMethodId: "visa", installments: 1, payerEmail: "buyer-test@example.com" });
@@ -86,6 +91,7 @@ describe("flujo integrado Mercado Pago", () => {
 
   it("rechaza webhook sin firma y sincroniza uno firmado", async () => {
     const { db, order, productId, originalStock } = await createTestOrder(); const secret = "webhook-test-secret"; process.env.MERCADOPAGO_WEBHOOK_SECRET = secret;
+    delete process.env.CONTABILIDAD_SALES_USERNAME; delete process.env.CONTABILIDAD_SALES_PASSWORD;
     global.fetch = vi.fn(async () => new Response(JSON.stringify({ id: 778899, status: "approved", external_reference: order.orderNumber, transaction_amount: order.totalInCents / 100 }), { status: 200, headers: { "Content-Type": "application/json" } })) as typeof fetch;
     const app = express(); app.use(express.json()); registerMercadoPagoWebhook(app);
     const server = await new Promise<ReturnType<typeof app.listen>>(resolve => { const instance = app.listen(0, () => resolve(instance)); });

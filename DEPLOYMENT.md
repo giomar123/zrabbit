@@ -53,6 +53,19 @@ La carga inicial crea únicamente los elementos que todavía no existan: la cate
 
 > **Pagos:** el checkout, los pedidos y los estados de pago ya cuentan con una base preparada. No se deben añadir las claves de Mercado Pago al repositorio ni al código. Cuando exista la cuenta de vendedor, se registrarán como secretos del entorno y se habilitará el formulario de pago dentro de la tienda.
 
+## Registro inmediato de ventas en contabilidad
+
+Cuando el módulo **Ventas** de contabilidad ya admita `externalReference`, configura en el servicio web zRabbit de Railway estas variables seguras, sin exponerlas en el repositorio:
+
+```dotenv
+CONTABILIDAD_SALES_USERNAME=cuenta-tecnica-de-ventas
+CONTABILIDAD_SALES_PASSWORD=contraseña-de-la-cuenta-tecnica
+```
+
+La cuenta debe poder crear ventas y consultar productos e inventario, pero no gestionar compras, usuarios, productos ni eliminaciones. Al aprobarse un pago, zRabbit registra cada artículo usando una referencia única basada en el número de pedido; si Mercado Pago reintenta la confirmación, contabilidad devuelve el resultado idempotente y no descuenta stock dos veces.
+
+> **Migraciones históricas:** en el entorno Railway actual no ejecutes `pnpm drizzle-kit migrate`, ya que una migración antigua de envíos se aplicó parcialmente y provoca la repetición de `shippingMethod`. Para activar la libreta de direcciones utiliza `pnpm repair:addresses`; este comando crea solo la tabla e índices de direcciones de forma idempotente.
+
 ## Validación antes de producción
 
 Antes de conectar un dominio y lanzar campañas, ejecuta `pnpm check` y `pnpm test`. Después del despliegue, configura `CANONICAL_ORIGIN` con el dominio definitivo y prueba una página de producto publicada con el depurador de enlaces de Meta. Cada producto publicado expone título, descripción, URL canónica, imagen Open Graph y datos estructurados desde el servidor.

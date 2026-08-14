@@ -192,10 +192,20 @@ export const appRouter = router({
     }),
     products: router({
       list: catalogEditorProcedure.query(async () => { const db = await requireDb(); return db.select({ product: products, category: categories }).from(products).innerJoin(categories, eq(products.categoryId, categories.id)).orderBy(desc(products.updatedAt)); }),
-      save: catalogEditorProcedure.input(productInput).mutation(async ({ input }) => {
-        const db = await requireDb(); const values = { categoryId: input.categoryId, name: input.name, slug: input.slug, sku: input.sku || null, shortDescription: input.shortDescription, description: input.description ?? null, priceInCents: input.priceInCents, compareAtPriceInCents: input.compareAtPriceInCents ?? null, stock: input.stock, status: input.status, isFeatured: input.isFeatured, isOffer: input.isOffer, mainImageUrl: input.mainImageUrl ?? null, metaTitle: input.metaTitle || null, metaDescription: input.metaDescription || null };
-        if (input.id) { await db.update(products).set(values).where(eq(products.id, input.id)); return { id: input.id }; }
-        const result = await db.insert(products).values(values); return { id: Number(result[0].insertId) };
+      save: catalogEditorProcedure.input(productInput.extend({ id: z.number().int().positive() })).mutation(async ({ input }) => {
+        const db = await requireDb();
+        const current = (await db.select({ id: products.id }).from(products).where(eq(products.id, input.id)).limit(1))[0];
+        if (!current) throw new TRPCError({ code: "NOT_FOUND", message: "El producto no existe." });
+        await db.update(products).set({
+          shortDescription: input.shortDescription,
+          description: input.description ?? null,
+          status: input.status,
+          isFeatured: input.isFeatured,
+          isOffer: input.isOffer,
+          metaTitle: input.metaTitle || null,
+          metaDescription: input.metaDescription || null,
+        }).where(eq(products.id, input.id));
+        return { id: input.id };
       }),
       publish: catalogEditorProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
         const db = await requireDb();
@@ -207,7 +217,9 @@ export const appRouter = router({
         return { success: true };
       }),
       archive: catalogEditorProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(products).set({ status: "archived" }).where(eq(products.id, input.id)); return { success: true }; }),
-      updateStock: catalogEditorProcedure.input(z.object({ id: z.number().int().positive(), stock: z.number().int().min(0) })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(products).set({ stock: input.stock }).where(eq(products.id, input.id)); return { success: true }; }),
+      updateStock: catalogEditorProcedure.input(z.object({ id: z.number().int().positive(), stock: z.number().int().min(0) })).mutation(() => {
+        throw new TRPCError({ code: "FORBIDDEN", message: "El stock se actualiza únicamente desde contabilidad." });
+      }),
     }),
     inventorySync: router({
       preview: adminProcedure.query(() => previewContabilidadImport()),
