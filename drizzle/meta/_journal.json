@@ -50,6 +50,20 @@
       "when": 1786642349462,
       "tag": "0006_hard_xavin",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1786698012051,
+      "tag": "0007_fluffy_leader",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1786698536395,
+      "tag": "0008_lucky_hawkeye",
+      "breakpoints": true
     }
   ]
 }

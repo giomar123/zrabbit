@@ -117,6 +117,26 @@ export const paymentEvents = mysqlTable("paymentEvents", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, table => [index("payment_events_order_idx").on(table.orderId), index("payment_events_payment_idx").on(table.providerPaymentId)]);
 
+export const inventorySyncRuns = mysqlTable("inventorySyncRuns", {
+  id: int("id").autoincrement().primaryKey(),
+  trigger: mysqlEnum("trigger", ["manual", "scheduled"]).notNull(),
+  status: mysqlEnum("status", ["running", "completed", "failed"]).default("running").notNull(),
+  createdCount: int("createdCount").default(0).notNull(),
+  updatedCount: int("updatedCount").default(0).notNull(),
+  skippedCount: int("skippedCount").default(0).notNull(),
+  errorMessage: varchar("errorMessage", { length: 500 }),
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  finishedAt: timestamp("finishedAt"),
+}, table => [index("inventory_sync_runs_started_idx").on(table.startedAt)]);
+
+export const inventorySyncSettings = mysqlTable("inventorySyncSettings", {
+  id: int("id").autoincrement().primaryKey(),
+  scheduleCronTaskUid: varchar("scheduleCronTaskUid", { length: 65 }).unique(),
+  lastScheduledAt: timestamp("lastScheduledAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type AuthorizedGoogleEmail = typeof authorizedGoogleEmails.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -125,3 +145,5 @@ export type Product = typeof products.$inferSelect;
 export type ProductImage = typeof productImages.$inferSelect;
 export type Order = typeof orders.$inferSelect;
 export type PaymentEvent = typeof paymentEvents.$inferSelect;
+export type InventorySyncRun = typeof inventorySyncRuns.$inferSelect;
+export type InventorySyncSettings = typeof inventorySyncSettings.$inferSelect;

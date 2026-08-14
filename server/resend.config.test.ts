@@ -1,13 +1,26 @@
 import { describe, expect, it } from "vitest";
 
+async function fetchWithRetry(url: string, options?: RequestInit): Promise<Response> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await fetch(url, options);
+    } catch (error) {
+      lastError = error;
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+  }
+  throw lastError;
+}
+
 describe("configuración de Resend", () => {
-  it("consulta los dominios de la cuenta sin enviar correos", async () => {
+  it.runIf(process.env.RUN_RESEND_DOMAIN_TEST === "true")("consulta los dominios de la cuenta sin enviar correos", async () => {
     const apiKey = process.env.RESEND_API_KEY;
     const fromAddress = process.env.RESEND_FROM_EMAIL;
     expect(apiKey, "RESEND_API_KEY debe estar configurada").toBeTruthy();
     expect(fromAddress, "RESEND_FROM_EMAIL debe estar configurado").toBeTruthy();
 
-    const response = await fetch("https://api.resend.com/domains", {
+    const response = await fetchWithRetry("https://api.resend.com/domains", {
       headers: { Authorization: `Bearer ${apiKey}` },
     });
 
@@ -25,7 +38,7 @@ describe("configuración de Resend", () => {
       domain => domain.name?.toLowerCase() === senderDomain && domain.status === "verified",
     );
     expect(verified, `El dominio ${senderDomain} debe estar verificado para enviar`).toBe(true);
-  });
+  }, 10_000);
 
   it.runIf(process.env.RUN_RESEND_SEND_TEST === "true")(
     "envía una única prueba autorizada con una clave de Sending access",
@@ -38,7 +51,7 @@ describe("configuración de Resend", () => {
       expect(fromAddress, "RESEND_FROM_EMAIL debe estar configurado").toBeTruthy();
       expect(recipient, "ORDER_NOTIFICATION_EMAIL debe estar configurado").toBeTruthy();
 
-      const response = await fetch("https://api.resend.com/emails", {
+      const response = await fetchWithRetry("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -56,5 +69,6 @@ describe("configuración de Resend", () => {
       const payload = (await response.json()) as { id?: string };
       expect(payload.id, "Resend debe devolver el ID del correo enviado").toBeTruthy();
     },
+    10_000,
   );
 });

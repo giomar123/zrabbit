@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { authorizedGoogleEmails, categories, orderItems, orders, paymentEvents, productImages, products, users } from "../drizzle/schema";
 import { createPendingOrder, getCatalogProductBySlug, listActiveCategories, listCatalogProducts } from "./catalog";
+import { getContabilidadSyncSettings, listContabilidadSyncRuns, previewContabilidadImport, runContabilidadImport } from "./contabilidadSync";
 import { getDb } from "./db";
 import { storagePut } from "./storage";
 import { COOKIE_NAME } from "@shared/const";
@@ -121,8 +122,23 @@ export const appRouter = router({
         if (input.id) { await db.update(products).set(values).where(eq(products.id, input.id)); return { id: input.id }; }
         const result = await db.insert(products).values(values); return { id: Number(result[0].insertId) };
       }),
+      publish: catalogEditorProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
+        const db = await requireDb();
+        const [product] = await db.select().from(products).where(eq(products.id, input.id)).limit(1);
+        if (!product) throw new Error("El producto no existe.");
+        const images = await db.select({ id: productImages.id }).from(productImages).where(eq(productImages.productId, input.id)).limit(1);
+        if (!images[0]) throw new Error("Carga al menos una fotografía antes de publicar el producto.");
+        await db.update(products).set({ status: "active" }).where(eq(products.id, input.id));
+        return { success: true };
+      }),
       archive: catalogEditorProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(products).set({ status: "archived" }).where(eq(products.id, input.id)); return { success: true }; }),
       updateStock: catalogEditorProcedure.input(z.object({ id: z.number().int().positive(), stock: z.number().int().min(0) })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(products).set({ stock: input.stock }).where(eq(products.id, input.id)); return { success: true }; }),
+    }),
+    inventorySync: router({
+      preview: adminProcedure.query(() => previewContabilidadImport()),
+      run: adminProcedure.mutation(async () => { const result = await runContabilidadImport("manual"); return result; }),
+      history: adminProcedure.query(() => listContabilidadSyncRuns()),
+      settings: adminProcedure.query(() => getContabilidadSyncSettings()),
     }),
     images: router({
       list: catalogEditorProcedure.input(z.object({ productId: z.number().int().positive() })).query(async ({ input }) => { const db = await requireDb(); return db.select().from(productImages).where(eq(productImages.productId, input.productId)).orderBy(productImages.sortOrder); }),

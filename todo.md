@@ -164,14 +164,32 @@
 - [ ] Integrar el flujo oficial de Yape con teléfono y OTP sin modificar el flujo de tarjeta.
 - [ ] Aclarar en el formulario Yape que el OTP real se obtiene en la app del comprador y que la simulación usa valores fijos.
 - [ ] Confirmar si la validación Yape se hará con credenciales de prueba o como cobro real antes de enviar un pago.
-- [ ] Evaluar la integración oficial directa de Yape y Plin frente a Mercado Pago, incluyendo requisitos y costes aplicables.
-- [ ] Configurar un proveedor de correo transaccional con un remitente verificado del dominio stevtel.com.
-- [ ] Enviar una notificación al administrador al crear un pedido y al confirmarse el pago.
-- [ ] Definir el remitente stevtel.com y el correo administrador destinatario para los avisos de Resend.
-- [ ] Configurar las alertas de Resend hacia erickcornejo01@gmail.com desde el remitente verificado de stevtel.com.
-- [ ] Validar la clave Sending access de Resend mediante un correo de prueba autorizado a erickcornejo01@gmail.com.
-- [ ] Enviar la prueba autorizada desde notificaciones@stevtel.com hacia erickcornejo01@gmail.com.
-- [ ] Consultar los dominios verificados de Resend con la API key activa para diagnosticar el remitente rechazado.
+- [x] Evaluar la integración oficial directa de Yape y Plin frente a Mercado Pago, incluyendo requisitos y costes aplicables.
+- [x] Configurar un proveedor de correo transaccional con un remitente verificado del dominio stevtel.com.
+- [x] Enviar una notificación al administrador al crear un pedido y al confirmarse el pago.
+- [x] Definir el remitente stevtel.com y el correo administrador destinatario para los avisos de Resend.
+- [x] Configurar las alertas de Resend hacia erickcornejo01@gmail.com desde el remitente verificado de stevtel.com.
+- [x] Validar la clave Sending access de Resend mediante un correo de prueba autorizado a erickcornejo01@gmail.com.
+- [x] Enviar la prueba autorizada desde notificaciones@stevtel.com hacia erickcornejo01@gmail.com.
+- [x] Consultar los dominios verificados de Resend con la API key activa para diagnosticar el remitente rechazado.
+- [ ] Copiar las tres variables de Resend al servicio zRabbit de Railway y redeplegar las alertas publicadas.
+- [ ] Confirmar la recepción de la prueba de Resend en erickcornejo01@gmail.com.
+- [x] Inspeccionar contabilidad.zrabbit.shop para identificar el acceso disponible y los datos de producto/stock exportables.
+- [x] Comparar una integración por API o webhook frente a una importación programada y proponer la ruta más segura.
+- [x] Definir un mapeo reversible para importar productos y stock sin imágenes desde contabilidad.zrabbit.shop.
+- [x] Implementar una importación inicial de productos y stock con control de duplicados.
+- [ ] Activar una sincronización autorizada de inventario sin modificar imágenes ni el checkout existente.
+- [x] Usar el precio sugerido de Compras como precio público, sin utilizar el valor unitario de inventario.
+- [x] Mantener contabilidad.zrabbit.shop en modo solo lectura durante la sincronización de productos y stock.
+- [x] Crear y limitar una cuenta técnica de solo lectura para la sincronización desde contabilidad.zrabbit.shop.
+- [x] Añadir un rol técnico de solo lectura en contabilidad antes de crear la cuenta de sincronización.
+- [x] Crear la cuenta técnica sync-zrabbit@stevtel.com con permisos exclusivos de lectura.
+- [x] Solicitar de forma segura el usuario y contraseña de la cuenta técnica para validar su acceso de solo lectura.
+- [x] Acordar si los productos importados se publican como borradores y la frecuencia de sincronización de solo lectura.
+- [ ] Sincronizar automáticamente cada 15 días y ofrecer un botón manual “Sincronizar ahora” en Administración.
+- [x] Importar todo producto externo como borrador, sin imágenes, y permitir publicarlo tras cargar fotografías.
+- [ ] Configurar en Railway un servicio cron de corta duración para ejecutar la sincronización cada 15 días.
+- [ ] Enviar una prueba de Resend posterior al despliegue Railway desde notificaciones@stevtel.com.
 - [ ] Crear un producto de prueba de Yape a S/ 10 con una excepción controlada al pedido mínimo.
 - [ ] Mantener el pedido mínimo de S/ 99 para cualquier carrito que contenga productos reales.
 - [x] Registrar eventos de webhook de Mercado Pago con estado, referencia de pedido y resultado de firma, sin almacenar secretos.

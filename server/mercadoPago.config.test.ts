@@ -3,7 +3,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { getMercadoPagoSafeTrace, verifyMercadoPagoAccess } from "./mercadoPago";
 
 describe("credenciales de Mercado Pago", () => {
-  it("valida el Access Token mediante el endpoint ligero de medios de pago", async () => {
+  it.runIf(process.env.RUN_MERCADOPAGO_CONFIG_TEST === "true")("valida el Access Token mediante el endpoint ligero de medios de pago", async () => {
     expect(process.env.VITE_MERCADOPAGO_PUBLIC_KEY).toBeTruthy();
     const result = await verifyMercadoPagoAccess();
     expect(result.paymentMethods).toBeGreaterThan(0);

@@ -22,6 +22,19 @@ function toStoreStatus(status: string | undefined): StoreOrderStatus {
 
 type MercadoPagoApiError = Error & { mercadoPagoStatus?: number; mercadoPagoCode?: string; mercadoPagoCause?: string };
 
+async function fetchWithRetry(url: string, init: RequestInit, attempts = 3): Promise<Response> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      return await fetch(url, init);
+    } catch (error) {
+      lastError = error;
+      await new Promise(resolve => setTimeout(resolve, 400));
+    }
+  }
+  throw lastError;
+}
+
 function fingerprint(value: string | undefined) {
   return value ? createHash("sha256").update(value).digest("hex").slice(0, 12) : null;
 }
@@ -38,7 +51,7 @@ export function getMercadoPagoSafeTrace(input: { cardToken?: string; clientPubli
 }
 
 async function mercadoFetch(path: string, init: RequestInit = {}) {
-  const response = await fetch(`https://api.mercadopago.com${path}`, { ...init, headers: { Authorization: `Bearer ${accessToken()}`, "Content-Type": "application/json", ...(init.headers ?? {}) } });
+  const response = await fetchWithRetry(`https://api.mercadopago.com${path}`, { ...init, headers: { Authorization: `Bearer ${accessToken()}`, "Content-Type": "application/json", ...(init.headers ?? {}) } });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(`Mercado Pago no pudo procesar el pago (${response.status}).`) as MercadoPagoApiError;
@@ -52,7 +65,7 @@ async function mercadoFetch(path: string, init: RequestInit = {}) {
 }
 
 export async function verifyMercadoPagoAccess(): Promise<{ paymentMethods: number }> {
-  const response = await fetch("https://api.mercadopago.com/v1/payment_methods", { headers: { Authorization: `Bearer ${accessToken()}` } });
+  const response = await fetchWithRetry("https://api.mercadopago.com/v1/payment_methods", { headers: { Authorization: `Bearer ${accessToken()}` } });
   if (!response.ok) throw new Error(`Mercado Pago rechazó las credenciales (${response.status}).`);
   const methods = await response.json() as unknown[];
   return { paymentMethods: methods.length };
