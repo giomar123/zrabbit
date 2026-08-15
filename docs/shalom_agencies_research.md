@@ -8,4 +8,6 @@ La integración de zRabbit debe tratar esas fuentes como datos externos no garan
 
 Antes de depender de este directorio en producción, se deberá comprobar que la respuesta permita consultas públicas consistentes y respetar los términos de Shalom. Como alternativa segura, el checkout enlazará al buscador oficial para que el cliente contraste la sede seleccionada.
 
-La consulta directa de `agencias/listar` desde el navegador respondió `403` y devolvió un cuerpo marcado como cifrado. Por ello zRabbit no intentará descifrar, automatizar ni reutilizar esa API sin documentación/autorización de Shalom. La selección de cercanía se basará en resultados visibles de Google Maps Places y mantendrá un enlace al buscador oficial de Shalom como contraste.
+La consulta directa de `agencias/listar` desde el navegador respondió `403` y devolvió un cuerpo marcado como cifrado. Por ello zRabbit no intentará descifrar, automatizar ni reutilizar esa API sin documentación/autorización de Shalom.
+
+La búsqueda oficial actual en `https://shalom.com.pe/agencias/aereo` sí devolvió agencias y marcadores reales al consultar Carabayllo. Sin embargo, sus cabeceras `X-Frame-Options: SAMEORIGIN` y `Content-Security-Policy: frame-ancestors 'self'` prohíben incrustarla dentro de zRabbit. Hasta contar con una API o autorización comercial de Shalom, el flujo seguro será abrir ese buscador oficial en una pestaña independiente y guardar solo la agencia que el cliente elija o escriba en su pedido.

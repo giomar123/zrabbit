@@ -10,10 +10,11 @@ describe("carrito lateral y entrega Shalom", () => {
     expect(drawer).toContain("Seguir comprando");
   });
 
-  it("consulta agencias mediante Places y enlaza al directorio oficial de Shalom", () => {
+  it("abre el directorio oficial de Shalom y guarda de forma manual la agencia elegida", () => {
     const finder = readFileSync(new URL("../client/src/components/ShalomAgencyFinder.tsx", import.meta.url), "utf8");
-    expect(finder).toContain("PlacesService");
-    expect(finder).toContain("https://agencias.shalom.pe/");
+    expect(finder).toContain("https://shalom.com.pe/agencias/aereo");
+    expect(finder).toContain("Buscar agencias oficiales de Shalom");
+    expect(finder).toContain("Guardar agencia para este envío");
     expect(finder).toContain("onSelect");
   });
 });

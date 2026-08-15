@@ -239,8 +239,13 @@
 - [x] Corregir la persistencia de sesión Google tras recargar la página y ofrecer selector de cuentas al iniciar sesión.
 - [ ] Confirmar en Railway que la sesión Google persiste al recargar y que el selector muestra las cuentas del navegador.
 - [x] Incluir dirección, distrito y teléfono de envío en el aviso administrativo de cada pedido confirmado.
-- [x] Buscar y mostrar agencias Shalom cercanas a la ubicación del cliente sin inventar direcciones ni distancias.
+- [ ] Buscar y mostrar agencias Shalom cercanas a la ubicación del cliente sin inventar direcciones ni distancias.
 - [x] Permitir elegir una agencia Shalom en checkout y guardar esa elección en el pedido.
 - [x] Añadir un mini-carrito lateral que se abra al agregar productos y permita seguir explorando la tienda.
 - [ ] Ejecutar en Railway `pnpm repair:shipping-agency` después del despliegue para activar la agencia elegida en los pedidos productivos.
 - [ ] Confirmar en producción la búsqueda de agencia Shalom y el aviso administrativo con dirección completa en el siguiente pedido controlado.
+- [x] Corregir el buscador Shalom que abre un panel vacío sin mostrar mapa ni puntos de entrega después de buscar un distrito.
+- [ ] Configurar una clave de Google Maps en Railway con Maps JavaScript API, Geocoding API y Places API habilitadas para mostrar agencias reales.
+- [ ] Investigar y usar una integración autorizada de la búsqueda oficial de agencias Shalom en lugar del mapa genérico.
+- [x] Reemplazar temporalmente el mapa vacío por un enlace oficial de Shalom y una selección manual de agencia hasta obtener autorización de API.
+- [x] Permitir que el cliente escriba la agencia Shalom elegida tras consultar el directorio oficial desde el checkout.
