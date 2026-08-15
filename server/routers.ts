@@ -59,7 +59,7 @@ export const appRouter = router({
       const email = ctx.customer.email.trim().toLowerCase();
       const orderRows = await db.select({
         id: orders.id, orderNumber: orders.orderNumber, totalInCents: orders.totalInCents, currency: orders.currency,
-        status: orders.status, shippingMethod: orders.shippingMethod, isFreeShipping: orders.isFreeShipping, createdAt: orders.createdAt, updatedAt: orders.updatedAt,
+        status: orders.status, shippingMethod: orders.shippingMethod, shippingAgencyName: orders.shippingAgencyName, shippingAgencyAddress: orders.shippingAgencyAddress, isFreeShipping: orders.isFreeShipping, createdAt: orders.createdAt, updatedAt: orders.updatedAt,
       }).from(orders).where(sql`LOWER(${orders.customerEmail}) = ${email}`).orderBy(desc(orders.createdAt));
       const orderIds = orderRows.map(order => order.id);
       const itemRows = orderIds.length ? await db.select({ id: orderItems.id, orderId: orderItems.orderId, productName: orderItems.productName, imageUrl: orderItems.imageUrl, unitPriceInCents: orderItems.unitPriceInCents, quantity: orderItems.quantity }).from(orderItems).where(inArray(orderItems.orderId, orderIds)) : [];
@@ -108,6 +108,7 @@ export const appRouter = router({
     createOrder: publicProcedure.input(z.object({
       customerName: z.string().trim().min(3).max(160), customerEmail: z.string().email(), customerPhone: z.string().trim().max(40).optional(),
       shippingAddress: z.string().trim().min(8).max(1000).optional(), shippingDistrict: z.string().trim().max(120).optional(),
+      shippingAgencyName: z.string().trim().min(2).max(180).optional(), shippingAgencyAddress: z.string().trim().min(4).max(300).optional(),
       items: z.array(z.object({ productId: z.number().int().positive(), quantity: z.number().int().min(1).max(10) })).min(1).max(20),
     })).mutation(async ({ ctx, input }) => {
       const order = await createPendingOrder(input);

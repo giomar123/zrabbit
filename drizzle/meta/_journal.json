@@ -71,6 +71,13 @@
       "when": 1786705128718,
       "tag": "0009_useful_the_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1786812951889,
+      "tag": "0010_goofy_onslaught",
+      "breakpoints": true
     }
   ]
 }

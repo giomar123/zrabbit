@@ -77,7 +77,7 @@ export function isMercadoPagoWebhookConfigured() { return Boolean(process.env.ME
 async function notifyApprovedOrder(order: typeof orders.$inferSelect, paymentId?: string | null) {
   const db = await getDb(); if (!db) return;
   const items = await db.select({ productName: orderItems.productName, quantity: orderItems.quantity, unitPriceInCents: orderItems.unitPriceInCents, subtotalInCents: orderItems.subtotalInCents }).from(orderItems).where(eq(orderItems.orderId, order.id));
-  await notifyPaymentApproved({ orderNumber: order.orderNumber, totalInCents: order.totalInCents, paymentId, customerName: order.customerName, customerEmail: order.customerEmail, shippingMethod: order.shippingMethod, isFreeShipping: order.isFreeShipping, items, createdAt: order.createdAt });
+  await notifyPaymentApproved({ orderNumber: order.orderNumber, totalInCents: order.totalInCents, paymentId, customerName: order.customerName, customerEmail: order.customerEmail, customerPhone: order.customerPhone, shippingAddress: order.shippingAddress, shippingDistrict: order.shippingDistrict, shippingAgencyName: order.shippingAgencyName, shippingAgencyAddress: order.shippingAgencyAddress, shippingMethod: order.shippingMethod, isFreeShipping: order.isFreeShipping, items, createdAt: order.createdAt });
 }
 
 export function verifyMercadoPagoWebhookSignature(input: { signature?: string; requestId?: string; dataId?: string }) {

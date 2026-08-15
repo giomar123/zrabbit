@@ -6,6 +6,12 @@ type OrderEmailInput = {
   orderNumber: string;
   totalInCents: number;
   shippingMethod: string | null;
+  customerName?: string;
+  customerPhone?: string | null;
+  shippingAddress?: string | null;
+  shippingDistrict?: string | null;
+  shippingAgencyName?: string | null;
+  shippingAgencyAddress?: string | null;
   items: OrderEmailItem[];
 };
 
@@ -65,22 +71,40 @@ function itemsList(items: OrderEmailItem[]) {
   return items.map(item => `${item.quantity} × ${item.productName}`).join(", ");
 }
 
+function deliveryDetails(input: Pick<OrderEmailInput, "customerName" | "customerPhone" | "shippingAddress" | "shippingDistrict" | "shippingAgencyName" | "shippingAgencyAddress">) {
+  const lines = [
+    input.customerName ? `Recibe: ${input.customerName}` : null,
+    input.customerPhone ? `Teléfono: ${input.customerPhone}` : null,
+    input.shippingAddress ? `Dirección: ${input.shippingAddress}` : null,
+    input.shippingDistrict ? `Distrito: ${input.shippingDistrict}` : null,
+    input.shippingAgencyName ? `Agencia Shalom seleccionada: ${input.shippingAgencyName}` : null,
+    input.shippingAgencyAddress ? `Ubicación de agencia: ${input.shippingAgencyAddress}` : null,
+  ].filter(Boolean) as string[];
+  return lines;
+}
+
 export async function notifyOrderCreated(input: OrderEmailInput) {
   const shipping = input.shippingMethod === "yape_test" ? "Prueba Yape" : "Shalom";
   const summary = itemsList(input.items);
+  const delivery = deliveryDetails(input);
+  const deliveryHtml = delivery.length ? `<section style="margin:18px 0;padding:14px;border:1px solid #d8b87d;background:#fffaf0"><strong>Datos de entrega</strong><br>${delivery.map(line => htmlEscape(line)).join("<br>")}</section>` : "";
+  const deliveryText = delivery.length ? `\nDatos de entrega:\n${delivery.join("\n")}` : "";
   const subject = `Nuevo pedido ${input.orderNumber} · ${formatCurrency(input.totalInCents)}`;
-  const html = `<main style="font-family:Arial,sans-serif;color:#142235;line-height:1.5"><h1 style="margin:0 0 16px">Nuevo pedido en zRabbit</h1><p><strong>Pedido:</strong> ${htmlEscape(input.orderNumber)}</p><p><strong>Total:</strong> ${formatCurrency(input.totalInCents)}</p><p><strong>Entrega:</strong> ${htmlEscape(shipping)}</p><p><strong>Productos:</strong> ${htmlEscape(summary)}</p><p style="color:#5b6573">El pedido está pendiente de pago. Revísalo en Administración → Pedidos.</p></main>`;
-  const text = `Nuevo pedido en zRabbit\nPedido: ${input.orderNumber}\nTotal: ${formatCurrency(input.totalInCents)}\nEntrega: ${shipping}\nProductos: ${summary}\nEstado: pendiente de pago.`;
+  const html = `<main style="font-family:Arial,sans-serif;color:#142235;line-height:1.5"><h1 style="margin:0 0 16px">Nuevo pedido en zRabbit</h1><p><strong>Pedido:</strong> ${htmlEscape(input.orderNumber)}</p><p><strong>Total:</strong> ${formatCurrency(input.totalInCents)}</p><p><strong>Entrega:</strong> ${htmlEscape(shipping)}</p>${deliveryHtml}<p><strong>Productos:</strong> ${htmlEscape(summary)}</p><p style="color:#5b6573">El pedido está pendiente de pago. Revísalo en Administración → Pedidos.</p></main>`;
+  const text = `Nuevo pedido en zRabbit\nPedido: ${input.orderNumber}\nTotal: ${formatCurrency(input.totalInCents)}\nEntrega: ${shipping}${deliveryText}\nProductos: ${summary}\nEstado: pendiente de pago.`;
   return sendOrderEmail(subject, html, text);
 }
 
-type PaymentApprovedInput = Pick<OrderEmailInput, "orderNumber" | "totalInCents"> & Partial<Pick<PurchaseTicketInput, "customerName" | "customerEmail" | "shippingMethod" | "isFreeShipping" | "items" | "createdAt">> & { paymentId?: string | null };
+type PaymentApprovedInput = Pick<OrderEmailInput, "orderNumber" | "totalInCents"> & Partial<Pick<PurchaseTicketInput, "customerName" | "customerEmail" | "shippingMethod" | "isFreeShipping" | "items" | "createdAt">> & Pick<OrderEmailInput, "customerPhone" | "shippingAddress" | "shippingDistrict" | "shippingAgencyName" | "shippingAgencyAddress"> & { paymentId?: string | null };
 
 export async function notifyPaymentApproved(input: PaymentApprovedInput) {
   const subject = `Pago aprobado ${input.orderNumber} · ${formatCurrency(input.totalInCents)}`;
   const paymentReference = input.paymentId ? `<p><strong>Referencia Mercado Pago:</strong> ${htmlEscape(input.paymentId)}</p>` : "";
-  const html = `<main style="font-family:Arial,sans-serif;color:#142235;line-height:1.5"><h1 style="margin:0 0 16px">Pago aprobado en zRabbit</h1><p><strong>Pedido:</strong> ${htmlEscape(input.orderNumber)}</p><p><strong>Total cobrado:</strong> ${formatCurrency(input.totalInCents)}</p>${paymentReference}<p style="color:#5b6573">El pedido ya figura como pagado. Revísalo en Administración → Pedidos.</p></main>`;
-  const text = `Pago aprobado en zRabbit\nPedido: ${input.orderNumber}\nTotal cobrado: ${formatCurrency(input.totalInCents)}${input.paymentId ? `\nReferencia Mercado Pago: ${input.paymentId}` : ""}`;
+  const delivery = deliveryDetails(input);
+  const deliveryHtml = delivery.length ? `<section style="margin:18px 0;padding:14px;border:1px solid #d8b87d;background:#fffaf0"><strong>Datos de entrega</strong><br>${delivery.map(line => htmlEscape(line)).join("<br>")}</section>` : "";
+  const deliveryText = delivery.length ? `\nDatos de entrega:\n${delivery.join("\n")}` : "";
+  const html = `<main style="font-family:Arial,sans-serif;color:#142235;line-height:1.5"><h1 style="margin:0 0 16px">Pago aprobado en zRabbit</h1><p><strong>Pedido:</strong> ${htmlEscape(input.orderNumber)}</p><p><strong>Total cobrado:</strong> ${formatCurrency(input.totalInCents)}</p>${paymentReference}${deliveryHtml}<p style="color:#5b6573">El pedido ya figura como pagado. Revísalo en Administración → Pedidos.</p></main>`;
+  const text = `Pago aprobado en zRabbit\nPedido: ${input.orderNumber}\nTotal cobrado: ${formatCurrency(input.totalInCents)}${input.paymentId ? `\nReferencia Mercado Pago: ${input.paymentId}` : ""}${deliveryText}`;
   const admin = await sendOrderEmail(subject, html, text);
   if (!input.customerEmail || !input.customerName || !input.items || input.isFreeShipping === undefined) return { admin, ticket: { sent: false as const, reason: "missing_ticket_data" as const } };
   const ticketInput: PurchaseTicketInput = { orderNumber: input.orderNumber, totalInCents: input.totalInCents, customerName: input.customerName, customerEmail: input.customerEmail, shippingMethod: input.shippingMethod ?? "shalom", isFreeShipping: input.isFreeShipping, items: input.items, paymentId: input.paymentId, createdAt: input.createdAt };
@@ -93,4 +117,4 @@ export async function notifyPaymentApproved(input: PaymentApprovedInput) {
   } catch (error) { console.error("[Purchase ticket] No se pudo preparar el ticket", error); return { admin, ticket: { sent: false as const, reason: "ticket_generation_failed" as const } }; }
 }
 
-export const orderNotificationInternals = { emailConfiguration, formatCurrency, htmlEscape, itemsList };
+export const orderNotificationInternals = { emailConfiguration, formatCurrency, htmlEscape, itemsList, deliveryDetails };
