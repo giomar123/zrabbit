@@ -234,3 +234,4 @@
 - [x] Enviar el ticket de compra por correo con una versión PDF adjunta tras la aprobación del pago.
 - [x] Ajustar el ticket de compra para calcular y mostrar IGV incluido de 18 %.
 - [ ] Confirmar en producción la recepción del correo de compra con el ticket PDF adjunto.
+- [x] Renombrar el campo Yape de código OTP a código de compra Yape y ajustar su ayuda visible.
