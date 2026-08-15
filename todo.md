@@ -245,6 +245,7 @@
 - [ ] Ejecutar en Railway `pnpm repair:shipping-agency` después del despliegue para activar la agencia elegida en los pedidos productivos.
 - [ ] Confirmar que las columnas shippingAgencyName y shippingAgencyAddress existen en Railway antes de reintentar un pedido con agencia.
 - [x] Añadir en Administración una vista de detalle de pedido con cliente, teléfono, dirección, distrito, agencia Shalom, artículos, pago y eventos.
+- [x] Mover el detalle debajo de la fila seleccionada y renombrar el control de Registro a Ver detalle.
 - [ ] Confirmar que Railway despliega el commit con el panel Detalle del pedido antes de validar sus datos en producción.
 - [ ] Corregir la conexión de Railway a la rama principal de GitHub si el redeploy conserva un commit anterior.
 - [ ] Confirmar que una recarga sin caché sirve el bundle actual antes de cambiar nuevamente el panel de pedidos.

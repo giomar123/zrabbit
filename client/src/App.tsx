@@ -14,8 +14,9 @@ import ProductDetail from "./pages/ProductDetail";
 import Storefront from "./pages/Storefront";
 import TermsAndShipping from "./pages/TermsAndShipping";
 import { CartDrawer } from "./components/CartDrawer";
+import { AdminOrderDetailDrawer } from "./components/AdminOrderDetailDrawer";
 
-function AdminWithCatalogActions() { return <><Admin /><AdminCatalogActions /></>; }
+function AdminWithCatalogActions() { return <><Admin /><AdminCatalogActions /><AdminOrderDetailDrawer /></>; }
 function Router() { return <Switch><Route path="/" component={Home} /><Route path="/catalogo">{() => <Storefront catalogueMode />}</Route><Route path="/productos/:slug">{params => <ProductDetail slug={params.slug} />}</Route><Route path="/carrito" component={Cart} /><Route path="/mis-pedidos" component={MyOrders} /><Route path="/terminos-y-envios" component={TermsAndShipping} /><Route path="/admin/login" component={AdminLogin} /><Route path="/admin" component={AdminWithCatalogActions} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch>; }
 function App() { return <ErrorBoundary><ThemeProvider defaultTheme="light"><CartProvider><Toaster /><CartDrawer /><Router /></CartProvider></ThemeProvider></ErrorBoundary>; }
 export default App;
