@@ -245,6 +245,11 @@
 - [ ] Ejecutar en Railway `pnpm repair:shipping-agency` después del despliegue para activar la agencia elegida en los pedidos productivos.
 - [ ] Confirmar que las columnas shippingAgencyName y shippingAgencyAddress existen en Railway antes de reintentar un pedido con agencia.
 - [x] Añadir en Administración una vista de detalle de pedido con cliente, teléfono, dirección, distrito, agencia Shalom, artículos, pago y eventos.
+- [ ] Confirmar que Railway despliega el commit con el panel Detalle del pedido antes de validar sus datos en producción.
+- [ ] Corregir la conexión de Railway a la rama principal de GitHub si el redeploy conserva un commit anterior.
+- [ ] Confirmar que una recarga sin caché sirve el bundle actual antes de cambiar nuevamente el panel de pedidos.
+- [ ] Inspeccionar en la consola Railway si el directorio dist contiene el texto “Detalle del pedido”.
+- [x] Corregir la política de caché del HTML de producción para que cada despliegue cargue el bundle frontend actual.
 - [ ] Confirmar en producción la búsqueda de agencia Shalom y el aviso administrativo con dirección completa en el siguiente pedido controlado.
 - [x] Corregir el buscador Shalom que abre un panel vacío sin mostrar mapa ni puntos de entrega después de buscar un distrito.
 - [ ] Configurar una clave de Google Maps en Railway con Maps JavaScript API, Geocoding API y Places API habilitadas para mostrar agencias reales.
