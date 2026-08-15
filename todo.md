@@ -235,3 +235,6 @@
 - [x] Ajustar el ticket de compra para calcular y mostrar IGV incluido de 18 %.
 - [ ] Confirmar en producción la recepción del correo de compra con el ticket PDF adjunto.
 - [x] Renombrar el campo Yape de código OTP a código de compra Yape y ajustar su ayuda visible.
+- [x] Sustituir la advertencia visible del ticket por una referencia neutral a los Términos y Condiciones.
+- [x] Corregir la persistencia de sesión Google tras recargar la página y ofrecer selector de cuentas al iniciar sesión.
+- [ ] Confirmar en Railway que la sesión Google persiste al recargar y que el selector muestra las cuentas del navegador.

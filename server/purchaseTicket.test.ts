@@ -12,12 +12,13 @@ describe("ticket de compra", () => {
     expect(totals.igvInCents).toBe(20_003 - totals.subtotalInCents);
   });
 
-  it("incluye líneas, envío y la advertencia de comprobante en el ticket HTML", () => {
+  it("incluye líneas, envío y una referencia neutral a Términos en el ticket HTML", () => {
     const html = purchaseTicketInternals.buildPurchaseTicketHtml({ orderNumber: "ZR-0001", customerName: "Cliente", customerEmail: "cliente@example.com", shippingMethod: "shalom", isFreeShipping: true, totalInCents: 9_900, items: [{ productName: "Figura <especial>", quantity: 1, unitPriceInCents: 9_900, subtotalInCents: 9_900 }] });
     expect(html).toContain("IGV (18%) incluido");
     expect(html).toContain("Envío gratis por Shalom");
     expect(html).toContain("Figura &lt;especial&gt;");
-    expect(html).toContain("No sustituye un comprobante");
+    expect(html).toContain("Términos y Condiciones de zRabbit");
+    expect(html).not.toContain("No sustituye un comprobante");
   });
 
   it("genera un PDF válido aunque el logo remoto no esté disponible", async () => {

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
-import { orderItems, orders, paymentEvents, products } from "../drizzle/schema";
+import { categories, orderItems, orders, paymentEvents, products } from "../drizzle/schema";
 import { createPendingOrder, MINIMUM_ORDER_IN_CENTS } from "./catalog";
 import { syncApprovedOrderToContabilidad } from "./contabilidadSales";
 import { getDb } from "./db";
@@ -18,11 +18,15 @@ afterEach(() => {
 describe("sincronización inmediata de venta aprobada", () => {
   it("envía una referencia por artículo y actualiza el stock recibido desde contabilidad", async () => {
     const db = await getDb(); if (!db) throw new Error("Base de datos no disponible para prueba.");
-    const product = (await db.select().from(products).where(eq(products.status, "active")).limit(1))[0];
-    if (!product?.sku) throw new Error("Se requiere un producto activo importado con SKU para la prueba.");
-    const quantity = Math.max(1, Math.ceil(MINIMUM_ORDER_IN_CENTS / product.priceInCents));
-    const originalStock = product.stock;
-    if (originalStock < quantity) await db.update(products).set({ stock: quantity }).where(eq(products.id, product.id));
+    const category = (await db.select().from(categories).limit(1))[0];
+    if (!category) throw new Error("Se requiere una categoría para la prueba.");
+    const suffix = `${Date.now()}-${Math.floor(Math.random() * 10_000)}`;
+    const sku = `SYNC-${suffix}`;
+    const created = await db.insert(products).values({ categoryId: category.id, name: "Producto temporal de sincronización", slug: `producto-temporal-${suffix}`, sku, shortDescription: "Producto temporal para aislar la prueba de ventas.", priceInCents: MINIMUM_ORDER_IN_CENTS, stock: 1, status: "active" });
+    const productId = Number(created[0].insertId);
+    const product = (await db.select().from(products).where(eq(products.id, productId)).limit(1))[0];
+    if (!product?.sku) throw new Error("No se creó el producto temporal de prueba.");
+    const quantity = 1;
     const order = await createPendingOrder({ customerName: "Prueba venta", customerEmail: "ventas-test@example.com", items: [{ productId: product.id, quantity }] });
     await db.update(orders).set({ status: "paid", mercadoPagoPaymentId: "sync-test-payment" }).where(eq(orders.id, order.id));
     process.env.CONTABILIDAD_SALES_USERNAME = "ventas-test@example.com";
@@ -47,7 +51,7 @@ describe("sincronización inmediata de venta aprobada", () => {
       await db.delete(paymentEvents).where(eq(paymentEvents.orderId, order.id));
       await db.delete(orderItems).where(eq(orderItems.orderId, order.id));
       await db.delete(orders).where(eq(orders.id, order.id));
-      await db.update(products).set({ stock: originalStock }).where(eq(products.id, product.id));
+      await db.delete(products).where(eq(products.id, product.id));
     }
   });
 });

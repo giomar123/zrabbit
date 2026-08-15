@@ -42,7 +42,10 @@ export function getSessionCookieOptions(
   return {
     httpOnly: true,
     path: "/",
-    sameSite: "none",
+    // La sesión se usa en la misma web y debe volver desde Google mediante una
+    // navegación superior; Lax evita bloqueos de cookies de terceros y conserva
+    // el estado al actualizar la página.
+    sameSite: "lax",
     secure: isSecureRequest(req),
   };
 }

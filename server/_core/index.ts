@@ -62,6 +62,9 @@ async function registerProductSharingRoutes(app: express.Express) {
 
 async function startServer() {
   const app = express();
+  // Railway termina TLS en su proxy. Express debe confiar en ese salto para
+  // mantener correctamente el contexto HTTPS de las cookies de sesión.
+  app.set("trust proxy", 1);
   const server = createServer(app);
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));

@@ -86,13 +86,12 @@ export function logoutGoogleCustomer(req: Request, res: Response) { res.clearCoo
 
 export function registerGoogleAuthRoutes(app: Express) {
   const beginLogin = (kind: LoginKind) => (req: Request, res: Response) => {
-    const { clientId, adminEmail, redirectUri } = config();
+    const { clientId, redirectUri } = config();
     const configured = kind === "admin" ? isGoogleAuthConfigured() : isGoogleCustomerAuthConfigured();
     if (!configured) return res.status(503).send("Google OAuth aún no está configurado en este entorno.");
     const state = randomBytes(32).toString("hex"); const nonce = randomBytes(32).toString("hex");
     res.cookie(GOOGLE_STATE_COOKIE, encodeState({ state, nonce, kind }), { ...getSessionCookieOptions(req), maxAge: 10 * 60 * 1000 });
     const params = new URLSearchParams({ client_id: clientId, redirect_uri: redirectUri, response_type: "code", scope: "openid email profile", state, nonce, prompt: "select_account" });
-    if (kind === "admin" && adminEmail) params.set("login_hint", adminEmail);
     res.redirect(302, `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
   };
 
