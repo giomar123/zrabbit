@@ -8,7 +8,10 @@ describe("editor móvil de productos", () => {
     expect(helper).toContain("min-width:44px");
     expect(helper).toContain("product-content-editor");
     expect(helper).toContain("mobileProductEditor");
+    expect(helper).toContain("order:-1");
+    expect(helper).not.toContain("position:fixed!important");
     expect(helper).toContain("Cerrar configuración");
+    expect(source).toContain('id="product-content-editor"');
     expect(source).toContain("zrabbit:close-product-editor");
     expect(source).toContain("Editar contenido de");
   });

@@ -17,12 +17,9 @@ export function AdminMobileEditorHelper() {
 
   useEffect(() => {
     if (!open) return;
-    const previousOverflow = document.body.style.overflow;
     document.documentElement.dataset.mobileProductEditor = "open";
-    document.body.style.overflow = "hidden";
     return () => {
       delete document.documentElement.dataset.mobileProductEditor;
-      document.body.style.overflow = previousOverflow;
     };
   }, [open]);
 
@@ -31,5 +28,5 @@ export function AdminMobileEditorHelper() {
     window.dispatchEvent(new Event("zrabbit:close-product-editor"));
   };
 
-  return <><style>{`${pencilSelector}{min-width:44px;min-height:44px;touch-action:manipulation;display:inline-grid;place-items:center}@media(max-width:1279px){html[data-mobile-product-editor="open"] ${editorSelector}{position:fixed!important;inset:0!important;z-index:90!important;display:block!important;overflow-y:auto!important;background:#f4f5f7!important;padding:5.25rem 1rem 2rem!important}html[data-mobile-product-editor="open"] ${editorSelector}>section{margin-bottom:1rem}}`}</style>{open && <button type="button" onClick={close} className="fixed right-4 top-4 z-[100] rounded-lg bg-[#101824] px-4 py-3 text-sm font-bold text-white shadow-lg">Cerrar configuración</button>}</>;
+  return <><style>{`${pencilSelector}{min-width:44px;min-height:44px;touch-action:manipulation;display:inline-grid;place-items:center}@media(max-width:1279px){html[data-mobile-product-editor="open"] ${editorSelector}{order:-1;position:relative!important;z-index:1;background:#fff;padding:1.25rem;border:1px solid #d9dee7;border-radius:1.25rem;box-shadow:0 18px 45px rgba(15,23,42,.14)}html[data-mobile-product-editor="open"] ${editorSelector}>section{margin-bottom:1rem}}`}</style>{open && <button type="button" onClick={close} className="fixed right-6 top-24 z-[100] grid h-11 w-11 place-items-center rounded-full border border-slate-200 bg-white text-2xl leading-none text-slate-500 shadow-lg" aria-label="Cerrar configuración">×</button>}</>;
 }

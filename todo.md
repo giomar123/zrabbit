@@ -248,6 +248,7 @@
 - [x] Mover el detalle debajo de la fila seleccionada y renombrar el control de Registro a Ver detalle.
 - [x] Corregir el lápiz de contenido e imágenes bloqueado para administradores desde el panel móvil.
 - [x] Abrir contenido, publicación e imágenes del producto en una ventana lateral al tocar el lápiz en móvil.
+- [x] Sustituir la ventana lateral por una tarjeta de edición integrada sobre la lista de productos en móvil.
 - [ ] Confirmar que Railway despliega el commit con el panel Detalle del pedido antes de validar sus datos en producción.
 - [ ] Corregir la conexión de Railway a la rama principal de GitHub si el redeploy conserva un commit anterior.
 - [ ] Confirmar que una recarga sin caché sirve el bundle actual antes de cambiar nuevamente el panel de pedidos.
