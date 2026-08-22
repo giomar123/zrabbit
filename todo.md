@@ -251,7 +251,7 @@
 - [x] Sustituir la ventana lateral por una tarjeta de edición integrada sobre la lista de productos en móvil.
 - [ ] Diagnosticar y corregir la carga de imágenes de producto desde el panel administrador móvil.
 - [ ] Diagnosticar y corregir la publicación de productos para que un borrador publicado aparezca en la tienda.
-- [ ] Ajustar la tarjeta de edición móvil con carga de foto, vista previa y acciones claras de guardar o cancelar.
+- [x] Ajustar la tarjeta de edición móvil con carga de foto, vista previa y acciones claras de guardar o cancelar.
 - [ ] Confirmar que Railway despliega el commit con el panel Detalle del pedido antes de validar sus datos en producción.
 - [ ] Corregir la conexión de Railway a la rama principal de GitHub si el redeploy conserva un commit anterior.
 - [ ] Confirmar que una recarga sin caché sirve el bundle actual antes de cambiar nuevamente el panel de pedidos.
@@ -263,3 +263,5 @@
 - [ ] Investigar y usar una integración autorizada de la búsqueda oficial de agencias Shalom en lugar del mapa genérico.
 - [x] Reemplazar temporalmente el mapa vacío por un enlace oficial de Shalom y una selección manual de agencia hasta obtener autorización de API.
 - [x] Permitir que el cliente escriba la agencia Shalom elegida tras consultar el directorio oficial desde el checkout.
+- [x] Simplificar la lista principal de productos ocultando código, precio y stock hasta abrir la edición.
+- [x] Rediseñar la tarjeta integrada de edición para que el detalle de producto sea más claro y cómodo en móvil.

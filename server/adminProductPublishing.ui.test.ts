@@ -14,6 +14,14 @@ describe("editor móvil de contenido y fotos", () => {
     expect(admin).toContain("Guardar cambios");
   });
 
+  it("mantiene código, precio y stock fuera de la lista principal, pero dentro del editor", () => {
+    const helper = readFileSync(resolve(process.cwd(), "client/src/components/AdminMobileEditorHelper.tsx"), "utf8");
+    expect(helper).toContain(".min-w-170 th:nth-child(2)");
+    expect(helper).toContain(".min-w-170 th:nth-child(3)");
+    expect(helper).toContain(".min-w-170 th:nth-child(4)");
+    expect(admin).toContain("Datos de contabilidad:");
+  });
+
   it("no permite publicar contenido sin al menos una fotografía", () => {
     expect(router).toContain('Carga al menos una fotografía antes de publicar el producto.');
   });
