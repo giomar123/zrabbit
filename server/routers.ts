@@ -197,6 +197,10 @@ export const appRouter = router({
         const db = await requireDb();
         const current = (await db.select({ id: products.id }).from(products).where(eq(products.id, input.id)).limit(1))[0];
         if (!current) throw new TRPCError({ code: "NOT_FOUND", message: "El producto no existe." });
+        if (input.status === "active") {
+          const image = await db.select({ id: productImages.id }).from(productImages).where(eq(productImages.productId, input.id)).limit(1);
+          if (!image[0]) throw new TRPCError({ code: "BAD_REQUEST", message: "Carga al menos una fotografía antes de publicar el producto." });
+        }
         await db.update(products).set({
           shortDescription: input.shortDescription,
           description: input.description ?? null,
@@ -237,7 +241,14 @@ export const appRouter = router({
         const encoded = input.dataUrl.split(",")[1];
         if (!encoded) throw new Error("El archivo de imagen no es válido.");
         const extension = input.contentType === "image/jpeg" ? "jpg" : input.contentType.split("/")[1];
-        const { key, url } = await storagePut(`products/${input.productId}/${Date.now()}.${extension}`, Buffer.from(encoded, "base64"), input.contentType);
+        let stored: { key: string; url: string };
+        try {
+          stored = await storagePut(`products/${input.productId}/${Date.now()}.${extension}`, Buffer.from(encoded, "base64"), input.contentType);
+        } catch (error) {
+          console.error("[Product image upload]", error instanceof Error ? error.message : "storage_error");
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No se pudo cargar la foto. Intenta con una imagen JPG o PNG de hasta 5 MB." });
+        }
+        const { key, url } = stored;
         const current = await db.select().from(productImages).where(eq(productImages.productId, input.productId));
         const isPrimary = current.length === 0;
         const result = await db.insert(productImages).values({ productId: input.productId, storageKey: key, url, altText: input.altText, sortOrder: current.length, isPrimary });

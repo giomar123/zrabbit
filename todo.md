@@ -249,6 +249,9 @@
 - [x] Corregir el lápiz de contenido e imágenes bloqueado para administradores desde el panel móvil.
 - [x] Abrir contenido, publicación e imágenes del producto en una ventana lateral al tocar el lápiz en móvil.
 - [x] Sustituir la ventana lateral por una tarjeta de edición integrada sobre la lista de productos en móvil.
+- [ ] Diagnosticar y corregir la carga de imágenes de producto desde el panel administrador móvil.
+- [ ] Diagnosticar y corregir la publicación de productos para que un borrador publicado aparezca en la tienda.
+- [ ] Ajustar la tarjeta de edición móvil con carga de foto, vista previa y acciones claras de guardar o cancelar.
 - [ ] Confirmar que Railway despliega el commit con el panel Detalle del pedido antes de validar sus datos en producción.
 - [ ] Corregir la conexión de Railway a la rama principal de GitHub si el redeploy conserva un commit anterior.
 - [ ] Confirmar que una recarga sin caché sirve el bundle actual antes de cambiar nuevamente el panel de pedidos.
