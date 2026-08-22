@@ -266,3 +266,5 @@
 - [x] Simplificar la lista principal de productos ocultando código, precio y stock hasta abrir la edición.
 - [x] Rediseñar la tarjeta integrada de edición para que el detalle de producto sea más claro y cómodo en móvil.
 - [x] Corregir el botón «Subir foto» para que abra el selector de archivos al editar un producto en móvil.
+- [ ] Reemplazar el control de carga por un selector móvil fiable y validar su funcionamiento en Railway.
+- [ ] Corregir la apertura del selector de fotos en Chrome móvil y el procesamiento de JPEG pequeño en Safari.

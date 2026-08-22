@@ -24,17 +24,10 @@ export function AdminMobileEditorHelper() {
   }, [open]);
 
   useEffect(() => {
-    const openPhotoPicker = (event: MouseEvent) => {
-      const source = event.target as Element | null;
-      if (!source || source.closest('input[type="file"]')) return;
-      const label = source.closest("#product-content-editor label");
-      const input = label?.querySelector<HTMLInputElement>('input[type="file"]');
-      if (!input || input.disabled) return;
-      event.preventDefault();
-      input.click();
-    };
-    document.addEventListener("click", openPhotoPicker);
-    return () => document.removeEventListener("click", openPhotoPicker);
+    const nativeFileInputStyle = document.createElement("style");
+    nativeFileInputStyle.textContent = `#product-content-editor label{position:relative}#product-content-editor label input[type="file"].hidden{display:block!important;position:absolute;inset:0;z-index:2;height:100%;width:100%;cursor:pointer;opacity:0}`;
+    document.head.append(nativeFileInputStyle);
+    return () => nativeFileInputStyle.remove();
   }, []);
 
   const close = () => {

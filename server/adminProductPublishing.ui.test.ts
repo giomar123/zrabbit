@@ -12,6 +12,8 @@ describe("editor móvil de contenido y fotos", () => {
     expect(admin).toContain("Subir foto");
     expect(admin).toContain("Publicar");
     expect(admin).toContain("Guardar cambios");
+    expect(admin).toContain("inferredUploadImageType");
+    expect(admin).toContain("imageDataUrl");
   });
 
   it("mantiene código, precio y stock fuera de la lista principal, pero dentro del editor", () => {
