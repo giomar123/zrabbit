@@ -265,3 +265,4 @@
 - [x] Permitir que el cliente escriba la agencia Shalom elegida tras consultar el directorio oficial desde el checkout.
 - [x] Simplificar la lista principal de productos ocultando código, precio y stock hasta abrir la edición.
 - [x] Rediseñar la tarjeta integrada de edición para que el detalle de producto sea más claro y cómodo en móvil.
+- [x] Corregir el botón «Subir foto» para que abra el selector de archivos al editar un producto en móvil.

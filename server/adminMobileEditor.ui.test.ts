@@ -11,6 +11,8 @@ describe("editor móvil de productos", () => {
     expect(helper).toContain("order:-1");
     expect(helper).not.toContain("position:fixed!important");
     expect(helper).toContain("Cerrar configuración");
+    expect(helper).toContain("openPhotoPicker");
+    expect(helper).toContain('input[type="file"]');
     expect(source).toContain('id="product-content-editor"');
     expect(source).toContain("zrabbit:close-product-editor");
     expect(source).toContain("Editar contenido de");

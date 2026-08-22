@@ -23,6 +23,20 @@ export function AdminMobileEditorHelper() {
     };
   }, [open]);
 
+  useEffect(() => {
+    const openPhotoPicker = (event: MouseEvent) => {
+      const source = event.target as Element | null;
+      if (!source || source.closest('input[type="file"]')) return;
+      const label = source.closest("#product-content-editor label");
+      const input = label?.querySelector<HTMLInputElement>('input[type="file"]');
+      if (!input || input.disabled) return;
+      event.preventDefault();
+      input.click();
+    };
+    document.addEventListener("click", openPhotoPicker);
+    return () => document.removeEventListener("click", openPhotoPicker);
+  }, []);
+
   const close = () => {
     setOpen(false);
     window.dispatchEvent(new Event("zrabbit:close-product-editor"));
