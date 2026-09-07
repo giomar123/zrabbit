@@ -12,8 +12,12 @@ describe("editor móvil de productos", () => {
     expect(helper).not.toContain("position:fixed!important");
     expect(helper).toContain("Cerrar configuración");
     expect(helper).not.toContain("openPhotoPicker");
-    expect(helper).toContain('input[type="file"].hidden');
+    expect(helper).not.toContain('input[type="file"].hidden');
+    expect(helper).not.toContain("nativeFileInputStyle");
     expect(helper).not.toContain(":has(");
+    expect(source).toContain('className="absolute inset-0 z-10 block h-full w-full cursor-pointer opacity-0"');
+    expect(source).toContain("const input = event.currentTarget");
+    expect(source).toContain('finally { input.value = ""; }');
     expect(source).toContain('id="product-content-editor"');
     expect(source).toContain("zrabbit:close-product-editor");
     expect(source).toContain("Editar contenido de");

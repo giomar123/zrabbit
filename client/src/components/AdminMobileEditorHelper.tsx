@@ -23,13 +23,6 @@ export function AdminMobileEditorHelper() {
     };
   }, [open]);
 
-  useEffect(() => {
-    const nativeFileInputStyle = document.createElement("style");
-    nativeFileInputStyle.textContent = `#product-content-editor label{position:relative}#product-content-editor label input[type="file"].hidden{display:block!important;position:absolute;inset:0;z-index:2;height:100%;width:100%;cursor:pointer;opacity:0}`;
-    document.head.append(nativeFileInputStyle);
-    return () => nativeFileInputStyle.remove();
-  }, []);
-
   const close = () => {
     setOpen(false);
     window.dispatchEvent(new Event("zrabbit:close-product-editor"));
