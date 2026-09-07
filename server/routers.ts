@@ -5,7 +5,7 @@ import { authorizedGoogleEmails, categories, customerAddresses, orderItems, orde
 import { createPendingOrder, getCatalogProductBySlug, listActiveCategories, listCatalogProducts } from "./catalog";
 import { getContabilidadSyncSettings, listContabilidadSyncRuns, previewContabilidadImport, runContabilidadImport } from "./contabilidadSync";
 import { getDb } from "./db";
-import { storagePut } from "./storage";
+import { isR2StorageUrl, storageDelete, storagePut } from "./storage";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { isGoogleAuthConfigured, logoutGoogleAdmin, logoutGoogleCustomer } from "./_core/googleAuth";
@@ -267,6 +267,12 @@ export const appRouter = router({
       remove: catalogEditorProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
         const db = await requireDb(); const image = await db.select().from(productImages).where(eq(productImages.id, input.id)).limit(1);
         if (!image[0]) return { success: true };
+        try {
+          if (isR2StorageUrl(image[0].url)) await storageDelete(image[0].storageKey);
+        } catch (error) {
+          console.error("[Product image delete]", error instanceof Error ? error.message : "storage_error");
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No se pudo retirar la foto del almacenamiento. Intenta nuevamente." });
+        }
         await db.delete(productImages).where(eq(productImages.id, input.id));
         if (image[0].isPrimary) await db.update(products).set({ mainImageUrl: null }).where(eq(products.id, image[0].productId));
         return { success: true };

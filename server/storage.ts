@@ -2,7 +2,43 @@
 // Uploads via Forge Server presigned URL to S3 (PUT direct).
 // Downloads return /manus-storage/{key} paths served via 307 redirect.
 
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { ENV } from "./_core/env";
+
+type R2Config = { endpoint: string; accessKeyId: string; secretAccessKey: string; bucket: string; publicBaseUrl: string };
+
+function getR2Config(): R2Config | null {
+  const values = [ENV.r2Endpoint, ENV.r2AccessKeyId, ENV.r2SecretAccessKey, ENV.r2Bucket, ENV.r2PublicBaseUrl];
+  if (values.every(value => !value)) return null;
+  if (values.some(value => !value)) {
+    throw new Error("R2 config incomplete: set R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET and R2_PUBLIC_BASE_URL");
+  }
+  return {
+    endpoint: ENV.r2Endpoint.replace(/\/+$/, ""),
+    accessKeyId: ENV.r2AccessKeyId,
+    secretAccessKey: ENV.r2SecretAccessKey,
+    bucket: ENV.r2Bucket,
+    publicBaseUrl: ENV.r2PublicBaseUrl.replace(/\/+$/, ""),
+  };
+}
+
+function r2Client(config: R2Config) {
+  return new S3Client({
+    region: "auto",
+    endpoint: config.endpoint,
+    credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey },
+  });
+}
+
+function publicObjectUrl(config: R2Config, key: string) {
+  const encodedKey = key.split("/").map(segment => encodeURIComponent(segment)).join("/");
+  return `${config.publicBaseUrl}/${encodedKey}`;
+}
+
+export function isR2StorageUrl(url: string) {
+  const config = getR2Config();
+  return Boolean(config && url.startsWith(`${config.publicBaseUrl}/`));
+}
 
 function getForgeConfig() {
   const forgeUrl = ENV.forgeApiUrl;
@@ -33,9 +69,20 @@ export async function storagePut(
   data: Buffer | Uint8Array | string,
   contentType = "application/octet-stream",
 ): Promise<{ key: string; url: string }> {
-  const { forgeUrl, forgeKey } = getForgeConfig();
   const key = appendHashSuffix(normalizeKey(relKey));
+  const r2 = getR2Config();
+  if (r2) {
+    await r2Client(r2).send(new PutObjectCommand({
+      Bucket: r2.bucket,
+      Key: key,
+      Body: data,
+      ContentType: contentType,
+      CacheControl: "public, max-age=31536000, immutable",
+    }));
+    return { key, url: publicObjectUrl(r2, key) };
+  }
 
+  const { forgeUrl, forgeKey } = getForgeConfig();
   // 1. Get presigned PUT URL from Forge
   const presignUrl = new URL("v1/storage/presign/put", forgeUrl + "/");
   presignUrl.searchParams.set("path", key);
@@ -73,7 +120,14 @@ export async function storagePut(
 
 export async function storageGet(relKey: string): Promise<{ key: string; url: string }> {
   const key = normalizeKey(relKey);
-  return { key, url: `/manus-storage/${key}` };
+  const r2 = getR2Config();
+  return r2 ? { key, url: publicObjectUrl(r2, key) } : { key, url: `/manus-storage/${key}` };
+}
+
+export async function storageDelete(relKey: string): Promise<void> {
+  const r2 = getR2Config();
+  if (!r2) return;
+  await r2Client(r2).send(new DeleteObjectCommand({ Bucket: r2.bucket, Key: normalizeKey(relKey) }));
 }
 
 export async function storageGetSignedUrl(relKey: string): Promise<string> {

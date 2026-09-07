@@ -46,6 +46,7 @@ La carga inicial crea únicamente los elementos que todavía no existan: la cate
 | `OWNER_OPEN_ID` | Identifica la cuenta propietaria que recibe el rol de administrador. | Obligatoria para operar el panel |
 | `CANONICAL_ORIGIN` | URL pública final, por ejemplo `https://tudominio.com`; se usa para `og:url`, canónica e imágenes de compartir. | Recomendable antes de campañas |
 | `MERCADOPAGO_ACCESS_TOKEN` | Procesa y confirma pagos desde el servidor. | Pendiente de crear la cuenta Mercado Pago |
+| `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_BASE_URL` | Guarda y sirve fotos de producto desde Cloudflare R2. | Obligatoria para que las nuevas fotos usen `media.zrabbit.shop`; guardar solo como secretos de Railway. |
 | `VITE_MERCADOPAGO_PUBLIC_KEY` | Tokeniza la tarjeta en el formulario de pago integrado. | Pendiente de crear la cuenta Mercado Pago |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Cliente OAuth web de Google para el panel administrador. | Obligatoria para acceder a `/admin` en Railway. |
 | `GOOGLE_ADMIN_EMAIL` | Dirección Gmail exacta autorizada para el panel. | Obligatoria para acceder a `/admin` en Railway. |
