@@ -268,3 +268,4 @@
 - [x] Corregir el botón «Subir foto» para que abra el selector de archivos al editar un producto en móvil.
 - [ ] Reemplazar el control de carga por un selector móvil fiable y validar su funcionamiento en Railway.
 - [ ] Corregir la apertura del selector de fotos en Chrome móvil y el procesamiento de JPEG pequeño en Safari.
+- [x] Mostrar un mensaje de producto agotado, registrar correos para aviso de reposición y notificar una vez al volver el inventario desde contabilidad.
