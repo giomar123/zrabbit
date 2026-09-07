@@ -1,9 +1,30 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { products, stockNotifications } from "../drizzle/schema";
 import { getDb } from "./db";
 
 type RestockSubscriber = { id: number; email: string };
 type RestockProduct = { id: number; name: string; slug: string; priceInCents: number };
+let schemaReady: Promise<void> | null = null;
+
+async function ensureStockNotificationsSchema() {
+  if (schemaReady) return schemaReady;
+  schemaReady = (async () => {
+    const db = await getDb();
+    if (!db) throw new Error("La base de datos no está disponible.");
+    await db.execute(sql.raw(`CREATE TABLE IF NOT EXISTS stockNotifications (
+      id INT AUTO_INCREMENT NOT NULL,
+      productId INT NOT NULL,
+      email VARCHAR(320) NOT NULL,
+      status ENUM('pending', 'sent') NOT NULL DEFAULT 'pending',
+      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      notifiedAt TIMESTAMP NULL,
+      PRIMARY KEY (id),
+      KEY stock_notifications_product_idx (productId, status),
+      UNIQUE KEY stock_notifications_product_email_uq (productId, email)
+    )`));
+  })().catch(error => { schemaReady = null; throw error; });
+  return schemaReady;
+}
 
 function htmlEscape(value: string) {
   return value.replace(/[&<>'"]/g, character => ({
@@ -82,6 +103,7 @@ export async function notifyRestockSubscribers(product: RestockProduct) {
 }
 
 export async function subscribeToRestock(productId: number, email: string) {
+  await ensureStockNotificationsSchema();
   const db = await getDb();
   if (!db) throw new Error("La base de datos no está disponible.");
   const [product] = await db.select({ id: products.id, name: products.name, stock: products.stock, status: products.status })
