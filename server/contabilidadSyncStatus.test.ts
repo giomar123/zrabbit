@@ -19,5 +19,6 @@ describe("estado de sincronización de ventas", () => {
     expect(summary.failed).toHaveLength(1);
     expect(summary.pending).toBe(1);
     expect(summary.missingSku).toHaveLength(1);
+    expect(summary.failed.length - summary.missingSku.length).toBe(0);
   });
 });
