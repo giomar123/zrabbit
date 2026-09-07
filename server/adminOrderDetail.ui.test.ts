@@ -15,6 +15,7 @@ describe("detalle administrativo de pedido", () => {
     expect(drawer).toContain("Reintentar registro en Contabilidad");
     expect(drawer).toContain("Estado actual:");
     expect(alert).toContain('role="alert"');
+    expect(alert).toContain("fixed bottom-5");
     expect(alert).toContain("código no encontrado en Contabilidad");
     expect(alert).toContain("summarizeContabilidadSyncAttention");
     expect(source).toContain('isAdmin && tab === "orders"');
