@@ -6,6 +6,7 @@ describe("detalle administrativo de pedido", () => {
     const source = readFileSync(new URL("../client/src/pages/Admin.tsx", import.meta.url), "utf8");
     const drawer = readFileSync(new URL("../client/src/components/AdminOrderDetailDrawer.tsx", import.meta.url), "utf8");
     const alert = readFileSync(new URL("../client/src/components/AdminSalesSyncAlert.tsx", import.meta.url), "utf8");
+    const syncStatus = readFileSync(new URL("../client/src/lib/contabilidadSyncStatus.ts", import.meta.url), "utf8");
     expect(source).toContain("Ver detalle");
     expect(source).toContain("zrabbit:open-order-detail");
     expect(drawer).toContain("Detalle del pedido");
@@ -16,8 +17,9 @@ describe("detalle administrativo de pedido", () => {
     expect(drawer).toContain("Estado actual:");
     expect(alert).toContain('role="alert"');
     expect(alert).toContain("fixed bottom-5");
-    expect(alert).toContain("código no encontrado en Contabilidad");
+    expect(syncStatus).toContain("código no encontrado en Contabilidad");
     expect(alert).toContain("summarizeContabilidadSyncAttention");
+    expect(alert).toContain("contabilidadSyncAttentionMessage");
     expect(source).toContain('isAdmin && tab === "orders"');
   });
 });

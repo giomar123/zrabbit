@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getContabilidadSyncState, summarizeContabilidadSyncAttention } from "../client/src/lib/contabilidadSyncStatus";
+import { contabilidadSyncAttentionMessage, getContabilidadSyncState, summarizeContabilidadSyncAttention } from "../client/src/lib/contabilidadSyncStatus";
 
 describe("estado de sincronización de ventas", () => {
   it("diferencia una venta pendiente, un registro exitoso y un SKU inexistente", () => {
@@ -20,5 +20,14 @@ describe("estado de sincronización de ventas", () => {
     expect(summary.pending).toBe(1);
     expect(summary.missingSku).toHaveLength(1);
     expect(summary.failed.length - summary.missingSku.length).toBe(0);
+  });
+
+  it("redacta un único aviso por cada incidencia sin duplicar el SKU inexistente", () => {
+    const summary = summarizeContabilidadSyncAttention([
+      { status: "paid", contabilidadSync: { result: "failed", reason: "No se encontró el código TEST-1 en contabilidad." } },
+      { status: "paid", contabilidadSync: { result: "failed", reason: "No se pudo iniciar sesión." } },
+      { status: "fulfilled", contabilidadSync: null },
+    ]);
+    expect(contabilidadSyncAttentionMessage(summary)).toBe("1 pedido tiene un código no encontrado en Contabilidad; 1 pedido con otro error de sincronización; 1 pendiente de registro. Abre Pedidos y usa Ver detalle para revisar el motivo y reintentar de forma segura.");
   });
 });
