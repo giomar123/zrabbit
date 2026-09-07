@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { categories, inventorySyncRuns, inventorySyncSettings, products } from "../drizzle/schema";
 import { getDb } from "./db";
+import { notifyRestockSubscribers } from "./restockNotifications";
 
 const SOURCE_URL = "https://contabilidad.zrabbit.shop";
 const RECEIVED_STATUS = "RECIBIDO";
@@ -48,6 +49,10 @@ export type ImportPreview = {
   products: ImportedProductPreview[];
   skipped: { sourceProductId: number; reason: string }[];
 };
+
+export function transitionedToInStock(previousStock: number, nextStock: number) {
+  return previousStock <= 0 && nextStock > 0;
+}
 
 const slugify = (value: string) => value
   .toLowerCase()
@@ -211,12 +216,20 @@ export async function runContabilidadImport(trigger: "manual" | "scheduled") {
       const categoryId = await categoryForImport(incoming, categoriesBySlug);
 
       if (existingBySku) {
+        const shouldNotifyRestock = transitionedToInStock(existingBySku.stock, incoming.stock);
         await db.update(products).set({
           categoryId,
           name: incoming.name,
           priceInCents: incoming.priceInCents,
           stock: incoming.stock,
         }).where(eq(products.id, existingBySku.id));
+        if (shouldNotifyRestock) {
+          try {
+            await notifyRestockSubscribers({ id: existingBySku.id, name: incoming.name, slug: existingBySku.slug, priceInCents: incoming.priceInCents });
+          } catch (error) {
+            console.error("[Inventory sync] No se pudieron procesar los avisos de reposición", { productId: existingBySku.id, error });
+          }
+        }
         updatedCount += 1;
       } else {
         const result = await db.insert(products).values({

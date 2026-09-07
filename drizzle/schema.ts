@@ -68,6 +68,18 @@ export const productImages = mysqlTable("productImages", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, table => [index("product_images_product_idx").on(table.productId)]);
 
+export const stockNotifications = mysqlTable("stockNotifications", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId").notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  status: mysqlEnum("status", ["pending", "sent"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  notifiedAt: timestamp("notifiedAt"),
+}, table => [
+  index("stock_notifications_product_idx").on(table.productId, table.status),
+  uniqueIndex("stock_notifications_product_email_uq").on(table.productId, table.email),
+]);
+
 export const orders = mysqlTable("orders", {
   id: int("id").autoincrement().primaryKey(),
   orderNumber: varchar("orderNumber", { length: 32 }).notNull(),
@@ -161,6 +173,7 @@ export type InsertUser = typeof users.$inferInsert;
 export type Category = typeof categories.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type ProductImage = typeof productImages.$inferSelect;
+export type StockNotification = typeof stockNotifications.$inferSelect;
 export type Order = typeof orders.$inferSelect;
 export type CustomerAddress = typeof customerAddresses.$inferSelect;
 export type PaymentEvent = typeof paymentEvents.$inferSelect;

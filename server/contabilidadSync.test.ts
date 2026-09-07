@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildImportPreview, RAILWAY_QUINCENAL_SYNC_CRON } from "./contabilidadSync";
+import { buildImportPreview, RAILWAY_QUINCENAL_SYNC_CRON, transitionedToInStock } from "./contabilidadSync";
 
 describe("mapeo de contabilidad a catálogo", () => {
   it("usa la última compra recibida, precio sugerido y stock final", () => {
@@ -30,5 +30,12 @@ describe("mapeo de contabilidad a catálogo", () => {
 
   it("programa la sincronización quincenal a las 09:00 de Perú", () => {
     expect(RAILWAY_QUINCENAL_SYNC_CRON).toBe("0 14 1,16 * *");
+  });
+
+  it("detecta exclusivamente el paso de agotado a disponible", () => {
+    expect(transitionedToInStock(0, 1)).toBe(true);
+    expect(transitionedToInStock(-2, 3)).toBe(true);
+    expect(transitionedToInStock(0, 0)).toBe(false);
+    expect(transitionedToInStock(2, 3)).toBe(false);
   });
 });

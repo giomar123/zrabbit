@@ -9,7 +9,7 @@ function editorContext(): TrpcContext {
 }
 
 describe("imágenes del perfil Editor", () => {
-  it("puede cargar y retirar una imagen de producto", async () => {
+  it.runIf(Boolean(process.env.DATABASE_URL))("puede cargar y retirar una imagen de producto", async () => {
     const caller = appRouter.createCaller(editorContext()); const product = (await caller.admin.products.list())[0]!.product;
     const uploaded = await caller.admin.images.upload({ productId: product.id, filename: "editor-test.png", contentType: "image/png", dataUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADElEQVR42mNk+M/wHwAF/gL+KHEMfQAAAABJRU5ErkJggg==", altText: "Imagen temporal editor" });
     expect(uploaded.url).toBe("https://example.com/editor-image.png");

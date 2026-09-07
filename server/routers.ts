@@ -6,6 +6,7 @@ import { createPendingOrder, getCatalogProductBySlug, listActiveCategories, list
 import { getContabilidadSyncSettings, listContabilidadSyncRuns, previewContabilidadImport, runContabilidadImport } from "./contabilidadSync";
 import { getDb } from "./db";
 import { isR2StorageUrl, storageDelete, storagePut } from "./storage";
+import { subscribeToRestock } from "./restockNotifications";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { isGoogleAuthConfigured, logoutGoogleAdmin, logoutGoogleCustomer } from "./_core/googleAuth";
@@ -103,6 +104,9 @@ export const appRouter = router({
     categories: publicProcedure.query(() => listActiveCategories()),
     products: publicProcedure.input(z.object({ categorySlug: z.string().optional(), minPrice: z.number().int().min(0).optional(), maxPrice: z.number().int().min(0).optional(), availableOnly: z.boolean().optional(), featuredOnly: z.boolean().optional(), offerOnly: z.boolean().optional() }).optional()).query(({ input }) => listCatalogProducts(input)),
     product: publicProcedure.input(z.object({ slug: slugSchema })).query(({ input }) => getCatalogProductBySlug(input.slug)),
+    stockNotifications: router({
+      subscribe: publicProcedure.input(z.object({ productId: z.number().int().positive(), email: z.string().trim().email().max(320) })).mutation(({ input }) => subscribeToRestock(input.productId, input.email)),
+    }),
   }),
   checkout: router({
     createOrder: publicProcedure.input(z.object({

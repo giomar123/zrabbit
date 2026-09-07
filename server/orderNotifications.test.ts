@@ -21,6 +21,11 @@ describe("notificaciones de pedido", () => {
   });
 
   it("mantiene la configuración de correo aislada de los destinatarios de clientes", () => {
-    expect(orderNotificationInternals.emailConfiguration()).toBeTruthy();
+    const configuration = orderNotificationInternals.emailConfiguration();
+    if (!configuration) {
+      expect(process.env.RESEND_API_KEY).toBeFalsy();
+      return;
+    }
+    expect(configuration.to).toBe(process.env.ORDER_NOTIFICATION_EMAIL);
   });
 });

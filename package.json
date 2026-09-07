@@ -17,6 +17,7 @@
     "repair:addresses": "node scripts/repair-customer-addresses.mjs",
     "repair:shipping-agency": "node scripts/repair-shipping-agency.mjs",
     "repair:sync-schema": "node scripts/repair-sync-schema.mjs",
+    "repair:stock-notifications": "node scripts/repair-stock-notifications.mjs",
     "sync:contabilidad": "NODE_ENV=production node dist/sync-contabilidad.js"
   },
   "dependencies": {

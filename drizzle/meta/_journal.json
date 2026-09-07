@@ -78,6 +78,13 @@
       "when": 1786812951889,
       "tag": "0010_goofy_onslaught",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1788810807429,
+      "tag": "0011_shy_shatterstar",
+      "breakpoints": true
     }
   ]
 }
