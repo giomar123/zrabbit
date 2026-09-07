@@ -15,6 +15,10 @@ export function contabilidadSaleReference(orderNumber: string, orderItemId: numb
   return `${orderNumber}:ITEM-${orderItemId}`;
 }
 
+export function isContabilidadRetryEligible(status: string) {
+  return status === "paid" || status === "fulfilled";
+}
+
 function endpoint(procedure: string) {
   return `${SOURCE_URL}/api/trpc/${procedure}?batch=1`;
 }
@@ -76,7 +80,7 @@ export async function syncApprovedOrderToContabilidad(orderId: number) {
   const db = await getDb();
   if (!db) throw new Error("La base de datos no está disponible.");
   const order = (await db.select().from(orders).where(eq(orders.id, orderId)).limit(1))[0];
-  if (!order || order.status !== "paid") return { status: "skipped" as const, reason: "order_not_paid" };
+  if (!order || !isContabilidadRetryEligible(order.status)) return { status: "skipped" as const, reason: "order_not_paid" };
   if (!isContabilidadSalesConfigured()) return { status: "skipped" as const, reason: "sales_account_not_configured" };
 
   try {

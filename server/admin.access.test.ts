@@ -26,6 +26,11 @@ describe("administración protegida", () => {
     await expect(caller.admin.images.list({ productId: 1 })).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 
+  it("protege el reintento de ventas hacia Contabilidad", async () => {
+    const caller = appRouter.createCaller(contextFor("user"));
+    await expect(caller.admin.orders.retryContabilidad({ orderId: 1 })).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
   it("impide que un administrador se quite su propio acceso", async () => {
     const caller = appRouter.createCaller(contextFor("admin"));
     await expect(caller.admin.users.setRole({ id: 1, role: "user" })).rejects.toThrow("No puedes retirarte el acceso");

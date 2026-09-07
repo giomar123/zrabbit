@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { contabilidadSaleReference, isContabilidadSalesConfigured } from "./contabilidadSales";
+import { contabilidadSaleReference, isContabilidadRetryEligible, isContabilidadSalesConfigured } from "./contabilidadSales";
 
 describe("registro de ventas hacia contabilidad", () => {
   it("genera una referencia diferente y estable para cada artículo del pedido", () => {
@@ -17,5 +17,12 @@ describe("registro de ventas hacia contabilidad", () => {
     expect(isContabilidadSalesConfigured()).toBe(true);
     if (username === undefined) delete process.env.CONTABILIDAD_SALES_USERNAME; else process.env.CONTABILIDAD_SALES_USERNAME = username;
     if (password === undefined) delete process.env.CONTABILIDAD_SALES_PASSWORD; else process.env.CONTABILIDAD_SALES_PASSWORD = password;
+  });
+
+  it("solo permite reintentar el registro de pedidos ya pagados o entregados", () => {
+    expect(isContabilidadRetryEligible("paid")).toBe(true);
+    expect(isContabilidadRetryEligible("fulfilled")).toBe(true);
+    expect(isContabilidadRetryEligible("awaiting_payment")).toBe(false);
+    expect(isContabilidadRetryEligible("cancelled")).toBe(false);
   });
 });

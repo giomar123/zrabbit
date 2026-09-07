@@ -5,12 +5,18 @@ describe("detalle administrativo de pedido", () => {
   it("muestra entrega, agencia, artículos, pago y eventos solo dentro del panel admin", () => {
     const source = readFileSync(new URL("../client/src/pages/Admin.tsx", import.meta.url), "utf8");
     const drawer = readFileSync(new URL("../client/src/components/AdminOrderDetailDrawer.tsx", import.meta.url), "utf8");
+    const alert = readFileSync(new URL("../client/src/components/AdminSalesSyncAlert.tsx", import.meta.url), "utf8");
     expect(source).toContain("Ver detalle");
     expect(source).toContain("zrabbit:open-order-detail");
     expect(drawer).toContain("Detalle del pedido");
     expect(drawer).toContain("shippingAgencyName");
     expect(drawer).toContain("shippingAgencyAddress");
     expect(drawer).toContain("Eventos y sincronización");
+    expect(drawer).toContain("Reintentar registro en Contabilidad");
+    expect(drawer).toContain("Estado actual:");
+    expect(alert).toContain('role="alert"');
+    expect(alert).toContain("código no encontrado en Contabilidad");
+    expect(alert).toContain("summarizeContabilidadSyncAttention");
     expect(source).toContain('isAdmin && tab === "orders"');
   });
 });

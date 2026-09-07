@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authorizedGoogleEmails, categories, customerAddresses, orderItems, orders, paymentEvents, productImages, products, users } from "../drizzle/schema";
 import { createPendingOrder, getCatalogProductBySlug, listActiveCategories, listCatalogProducts } from "./catalog";
 import { getContabilidadSyncSettings, listContabilidadSyncRuns, previewContabilidadImport, runContabilidadImport } from "./contabilidadSync";
+import { syncApprovedOrderToContabilidad } from "./contabilidadSales";
 import { getDb } from "./db";
 import { isR2StorageUrl, storageDelete, storagePut } from "./storage";
 import { subscribeToRestock } from "./restockNotifications";
@@ -285,11 +286,39 @@ export const appRouter = router({
     orders: router({
       list: adminProcedure.query(async () => {
         const db = await requireDb();
-        const [orderRows, itemRows] = await Promise.all([db.select().from(orders).orderBy(desc(orders.createdAt)), db.select().from(orderItems)]);
-        return orderRows.map(order => ({ ...order, items: itemRows.filter(item => item.orderId === order.id) }));
+        const [orderRows, itemRows, syncEvents] = await Promise.all([
+          db.select().from(orders).orderBy(desc(orders.createdAt)),
+          db.select().from(orderItems),
+          db.select().from(paymentEvents).where(eq(paymentEvents.eventType, "contabilidad_sale")).orderBy(desc(paymentEvents.createdAt)),
+        ]);
+        const latestSyncByOrder = new Map<number, typeof syncEvents[number]>();
+        for (const event of syncEvents) {
+          if (event.orderId && !latestSyncByOrder.has(event.orderId)) latestSyncByOrder.set(event.orderId, event);
+        }
+        return orderRows.map(order => ({
+          ...order,
+          items: itemRows.filter(item => item.orderId === order.id),
+          contabilidadSync: latestSyncByOrder.get(order.id) ?? null,
+        }));
       }),
       paymentEvents: adminProcedure.input(z.object({ orderId: z.number().int().positive() })).query(async ({ input }) => { const db = await requireDb(); return db.select().from(paymentEvents).where(eq(paymentEvents.orderId, input.orderId)).orderBy(desc(paymentEvents.createdAt)); }),
-      updateStatus: adminProcedure.input(z.object({ id: z.number().int().positive(), status: z.enum(["pending", "awaiting_payment", "paid", "cancelled", "fulfilled"]) })).mutation(async ({ input }) => { const db = await requireDb(); await db.update(orders).set({ status: input.status }).where(eq(orders.id, input.id)); return { success: true }; }),
+      updateStatus: adminProcedure.input(z.object({ id: z.number().int().positive(), status: z.enum(["pending", "awaiting_payment", "paid", "cancelled", "fulfilled"]) })).mutation(async ({ input }) => {
+        const db = await requireDb();
+        const [current] = await db.select().from(orders).where(eq(orders.id, input.id)).limit(1);
+        if (!current) throw new TRPCError({ code: "NOT_FOUND", message: "El pedido no existe." });
+        await db.update(orders).set({ status: input.status }).where(eq(orders.id, input.id));
+        if (input.status === "paid" && current.status !== "paid") {
+          return { success: true, contabilidadSync: await syncApprovedOrderToContabilidad(input.id) };
+        }
+        return { success: true, contabilidadSync: null };
+      }),
+      retryContabilidad: adminProcedure.input(z.object({ orderId: z.number().int().positive() })).mutation(async ({ input }) => {
+        const db = await requireDb();
+        const [order] = await db.select().from(orders).where(eq(orders.id, input.orderId)).limit(1);
+        if (!order) throw new TRPCError({ code: "NOT_FOUND", message: "El pedido no existe." });
+        if (order.status !== "paid" && order.status !== "fulfilled") throw new TRPCError({ code: "BAD_REQUEST", message: "Solo se pueden reintentar pedidos pagados o entregados." });
+        return syncApprovedOrderToContabilidad(order.id);
+      }),
     }),
   }),
 });
